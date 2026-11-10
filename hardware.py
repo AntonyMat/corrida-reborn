@@ -15,6 +15,7 @@ pode tremer um pouco).
 
 import json
 import os
+import threading
 import time
 
 import config
@@ -258,7 +259,7 @@ class Servo:
 class Motores:
     """Os dois motores de tracao andam juntos (mesmo comando)."""
 
-    def __init__(self, simulado=False):
+    def __init__(self, simulado=False, timeout_s=0.25):
         G = self.G = gpio(simulado)
         for p in (config.ENA, config.IN1, config.IN2, config.ENB, config.IN3, config.IN4):
             G.setup(p, G.OUT)
@@ -269,6 +270,17 @@ class Motores:
         self.pwm_a.start(0)
         self.pwm_b.start(0)
         self.ultimo = 0.0
+        # WATCHDOG: se ninguem mandar comando por timeout_s (laco travado), para os motores
+        self._timeout = timeout_s
+        self._t_cmd = time.monotonic()
+        self._vivo = True
+        threading.Thread(target=self._vigia, daemon=True).start()
+
+    def _vigia(self):
+        while self._vivo:
+            time.sleep(0.05)
+            if self.ultimo != 0.0 and time.monotonic() - self._t_cmd > self._timeout:
+                self.parar()
 
     def motor(self, qual, speed):
         """qual 'A' ou 'B'; speed -1..1 (positivo = pra frente)."""
@@ -286,6 +298,7 @@ class Motores:
         pwm.ChangeDutyCycle(abs(speed) * 100.0)
 
     def andar(self, speed):
+        self._t_cmd = time.monotonic()
         self.motor("A", speed)
         self.motor("B", speed)
         self.ultimo = speed
@@ -299,6 +312,7 @@ class Motores:
         self.ultimo = 0.0
 
     def fechar(self):
+        self._vivo = False
         self.parar()
         time.sleep(0.1)
         self.pwm_a.stop()

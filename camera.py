@@ -165,7 +165,7 @@ class CameraThread:
 
     def _loop(self):
         falhas = 0
-        t_ok = time.time()
+        t_ok = time.monotonic()
         while self._rodando:
             ok, frame = self.cap.read()
             if not ok:
@@ -174,17 +174,17 @@ class CameraThread:
                     time.sleep(0.01)
                     continue
                 falhas += 1
-                if falhas >= self._falhas_max or (time.time() - t_ok) > self._silencio_max:
+                if falhas >= self._falhas_max or (time.monotonic() - t_ok) > self._silencio_max:
                     if self._tentar_reabrir():
                         falhas = 0
-                        t_ok = time.time()
+                        t_ok = time.monotonic()
                     else:
                         time.sleep(1.0)
                 else:
                     time.sleep(0.02)
                 continue
             falhas = 0
-            t_ok = time.time()
+            t_ok = time.monotonic()
             with self._lock:
                 self._frame = frame
                 self._idx += 1
@@ -195,7 +195,7 @@ class CameraThread:
         with self._lock:
             if self._frame is None:
                 return None, 0, float("inf")
-            return self._frame, self._idx, time.time() - self._t
+            return self._frame, self._idx, time.monotonic() - self._t
 
     def release(self):
         self._rodando = False

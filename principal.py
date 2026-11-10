@@ -90,8 +90,8 @@ def main():
         print("Erro: a camera nao abriu (v4l2-ctl --list-devices).")
         return
     thread = CameraThread(cap, reabrir=lambda: abrir_camera(a.camera))
-    t_espera = time.time()
-    while thread.read()[0] is None and time.time() - t_espera < 6.0:
+    t_espera = time.monotonic()
+    while thread.read()[0] is None and time.monotonic() - t_espera < 6.0:
         time.sleep(0.05)
     if thread.read()[0] is None:
         print("\nERRO: a camera abriu mas NAO entrega quadros. Nao vou andar as cegas.\n"
@@ -154,7 +154,7 @@ def main():
                 f, idx, idade = thread.read()
                 if f is not None and idx != ultimo["idx"] and idade < 0.3:
                     ultimo["idx"] = idx
-                    return ajustar(f), time.time()
+                    return ajustar(f), time.monotonic()
                 time.sleep(0.002)
 
         try:
@@ -202,9 +202,9 @@ def main():
 
     ultimo_idx = -1
     avisou_velho = False
-    t_ini = time.time()
+    t_ini = time.monotonic()
     n, fps_medido = 0, 15.0
-    t_fps, frames = time.time(), 0
+    t_fps, frames = time.monotonic(), 0
     print("Rodando. Ctrl+C (ou 'q' na janela) para parar.")
     try:
         while True:
@@ -223,11 +223,22 @@ def main():
             avisou_velho = False
             frame = ajustar(frame)
 
-            agora = time.time()
+            # instante em que o quadro foi CAPTURADO (nao o de agora): o dt do controle e a
+            # pose consideram a latencia da camera/USB
+            agora = time.monotonic() - idade
             n += 1
             mostrar = ver and (n % config.DEBUG_CADA == 0)
-            turn, speed = piloto.step(agora, frame, fps=fps_medido,
-                                      debug=mostrar or registro is not None)
+            # BEV/mascara de debug custam copias: so quando ha janela ou no log, a cada N quadros
+            debug = mostrar or (registro is not None and n % config.DEBUG_LOG_CADA == 0)
+            try:
+                turn, speed = piloto.step(agora, frame, fps=fps_medido, debug=debug)
+            except Exception as e:      # um quadro ruim nao derruba a corrida: trata como faixa perdida
+                msg = f"[erro] quadro descartado: {e!r}"
+                print("  " + msg)
+                if registro:
+                    registro.evento(msg)
+                turn, speed = piloto.direcao.decair(0.8), 0.0
+                piloto.turn, piloto.speed = turn, speed
             if servo:
                 servo.virar(turn)
                 motores.andar(speed)
@@ -242,16 +253,16 @@ def main():
                 registro.telemetria(piloto, fps_medido)
 
             frames += 1
-            if time.time() - t_fps >= 2.0:
-                fps_medido = frames / (time.time() - t_fps)
-                frames, t_fps = 0, time.time()
+            if time.monotonic() - t_fps >= 2.0:
+                fps_medido = frames / (time.monotonic() - t_fps)
+                frames, t_fps = 0, time.monotonic()
                 _resumo(piloto, fps_medido)
 
             if mostrar:
                 cv2.imshow("reborn-autonomos", visual.compor(piloto, frame))
                 if (cv2.waitKey(1) & 0xFF) == ord('q'):
                     break
-            if a.tempo and time.time() - t_ini >= a.tempo:
+            if a.tempo and time.monotonic() - t_ini >= a.tempo:
                 print(f"Tempo de {a.tempo:.0f}s acabou.")
                 break
     except KeyboardInterrupt:
