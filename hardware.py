@@ -303,6 +303,13 @@ class Motores:
         self.motor("B", speed)
         self.ultimo = speed
 
+    def andar_por(self, speed, segundos):
+        """Anda por `segundos` renovando o comando (o watchdog para o motor se ele ficar mudo)."""
+        fim = time.monotonic() + segundos
+        while time.monotonic() < fim:
+            self.andar(speed)
+            time.sleep(0.05)
+
     def parar(self):
         self.pwm_a.ChangeDutyCycle(0)
         self.pwm_b.ChangeDutyCycle(0)

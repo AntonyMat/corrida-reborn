@@ -52,8 +52,7 @@ def main():
                 print("  ok")
             time.sleep(0.4)
         input("\nEnter pra girar os DOIS pra frente juntos...")
-        m.andar(POTENCIA)
-        time.sleep(TEMPO)
+        m.andar_por(POTENCIA, TEMPO)
         m.parar()
         print("Fim do teste.")
     except KeyboardInterrupt:

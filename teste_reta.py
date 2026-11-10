@@ -44,8 +44,7 @@ def main():
             servo.angulo(cal["centro"], forcar=True)
             input(f"\nCarro no chao, apontado pra frente, area livre. Enter pra andar "
                   f"reto {TEMPO:.1f}s a {POT:.2f} (Ctrl+C para)...")
-            motores.andar(POT)
-            time.sleep(TEMPO)
+            motores.andar_por(POT, TEMPO)
             motores.parar()
             r = pergunta("Pra onde o carro foi? (e = esquerda / d = direita / r = foi reto / q = sair): ")
             if r == "q" or r == "r":
