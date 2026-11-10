@@ -41,7 +41,7 @@ carro, potência mínima), pista com a contínua dos dois lados e o simulador em
 | ENA (PWM motor A) | 12 | 32 | L298N ENA (**remover o jumper**) |
 | IN1 | 23 | 16 | L298N IN1 |
 | IN2 | 24 | 18 | L298N IN2 |
-| ENB (PWM motor B) | 13 | 33 | L298N ENB (**remover o jumper**) |
+| ENB (PWM motor B) | 19 | 35 | L298N ENB (**remover o jumper**) |
 | IN3 | 25 | 22 | L298N IN3 |
 | IN4 | 16 | 36 | L298N IN4 |
 | GND | — | 6/9/14… | GND da L298N **e** GND do servo/bateria (terra comum) |

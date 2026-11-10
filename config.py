@@ -24,7 +24,7 @@ SERVO_PIN = 18          # fio de sinal do servo (pino fisico 12)
 ENA = 12                # PWM motor A  (pino fisico 32)  - remover jumper da L298N
 IN1 = 23                # pino fisico 16
 IN2 = 24                # pino fisico 18
-ENB = 13                # PWM motor B  (pino fisico 33)  - remover jumper da L298N
+ENB = 19                # PWM motor B  (pino fisico 35)  - remover jumper da L298N
 IN3 = 25                # pino fisico 22
 IN4 = 16                # pino fisico 36
 # GND da L298N + GND do servo/bateria + GND do Pi: terra comum (pino 6/9/14...)
