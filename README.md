@@ -38,12 +38,12 @@ carro, potência mínima), pista com a contínua dos dois lados e o simulador em
 | Função | GPIO | Pino físico | Liga em |
 |---|---|---|---|
 | Servo (sinal) | 18 | 12 | fio de sinal do servo |
-| ENA (PWM motor A) | 12 | 32 | L298N ENA (**remover o jumper**) |
-| IN1 | 23 | 16 | L298N IN1 |
-| IN2 | 24 | 18 | L298N IN2 |
-| ENB (PWM motor B) | 19 | 35 | L298N ENB (**remover o jumper**) |
-| IN3 | 25 | 22 | L298N IN3 |
-| IN4 | 16 | 36 | L298N IN4 |
+| ENA (PWM motor A, esquerdo) | 6 | 31 | L298N ENA (**remover o jumper**) |
+| IN1 (esquerdo) | 19 | 35 | L298N IN1 |
+| IN2 (esquerdo) | 26 | 37 | L298N IN2 |
+| ENB (PWM motor B, direito) | 12 | 32 | L298N ENB (**remover o jumper**) |
+| IN3 (direito) | 20 | 38 | L298N IN3 |
+| IN4 (direito) | 21 | 40 | L298N IN4 |
 | GND | — | 6/9/14… | GND da L298N **e** GND do servo/bateria (terra comum) |
 
 Está em `config.py` (seção 1). Servo alimentado pela bateria/BEC (5–6 V), **não** pelo 5 V do Pi. Cuidado com o aviso de baixa tensão: ele derruba câmera e servo.
