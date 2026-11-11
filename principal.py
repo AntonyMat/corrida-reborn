@@ -248,7 +248,7 @@ def main():
                 if registro:
                     registro.evento(linha)
                     registro.foto(linha.split("]")[0].strip("[ ") if "]" in linha else "ev",
-                                  visual.compor(piloto, frame) if piloto.res.bev is not None else None)
+                                  visual.compor(piloto, frame) if piloto.res.bev is not None else frame)   # sem BEV de debug: ao menos o quadro cru
             if registro:
                 registro.telemetria(piloto, fps_medido)
 
