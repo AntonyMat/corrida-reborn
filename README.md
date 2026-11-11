@@ -1,5 +1,8 @@
 # reborn-autonomos
 
+> Fork de [M-viniciusqp/corrida-reborn](https://github.com/M-viniciusqp/corrida-reborn) com a fiação deste carro,
+> scripts de teste de hardware e melhorias de tempo real e segurança (veja *Mudanças neste fork*, no fim).
+
 Carro autônomo (Raspberry Pi) que **segue a faixa** com **uma câmera**.
 Faz a mesma tarefa do `gatuno-rapido`, mas com outra lógica, pensada para o carro novo
 (câmera em outro ângulo). Não precisa ser rápido: processa em 320x180.
@@ -48,6 +51,19 @@ carro, potência mínima), pista com a contínua dos dois lados e o simulador em
 
 Está em `config.py` (seção 1). Servo alimentado pela bateria/BEC (5–6 V), **não** pelo 5 V do Pi. Cuidado com o aviso de baixa tensão: ele derruba câmera e servo.
 
+**Alimentação e terra (não saem de GPIO):**
+
+| Fio | Liga em |
+|---|---|
+| GND comum | negativo da bateria, GND do L298N, GND do servo **e** um GND do Pi (pinos 6, 9, 14, 20, 25, 30, 34 ou 39) |
+| Servo VCC (vermelho) | positivo do BEC/bateria (5–6 V); **nunca** no 5 V do Pi |
+| L298N 12V (VS) | positivo da bateria dos motores |
+| L298N OUT1/OUT2 | motor esquerdo (canal A, `MOTOR_A_INVERTIDO`) |
+| L298N OUT3/OUT4 | motor direito (canal B, `MOTOR_B_INVERTIDO`) |
+
+Câmera: USB, `/dev/video0` (`CAMERA_ID = 0`). Os dois motores recebem sempre o mesmo comando; se uma roda girar ao
+contrário, troque `MOTOR_A_INVERTIDO` ou `MOTOR_B_INVERTIDO` no `config.py` em vez de trocar fios.
+
 ## Passo a passo no Raspberry Pi
 
 ```bash
@@ -61,9 +77,10 @@ Só isso. **Não há etapa de calibração antes de largar** (servo: ângulos fi
 direção, puxão, largura da pista, lado da faixa contínua e luz: aprendidos/relativos andando).
 
 Se quiser conferir antes (opcional):
-1. **Fiação dos motores** (carro suspenso, rodas fora do chão): `python3 teste_motores.py`
+1. **Fiação dos motores** (carro suspenso, rodas fora do chão): `python3 teste_motores.py`. Só andar para frente, os dois juntos: `python3 frente.py --vel 0.8 --tempo 5`. Se um canal não girar, `python3 teste_pinos.py` liga o ENABLE fixo (sem PWM) para separar defeito de PWM de defeito de fiação/driver.
 2. **Servo**: `python3 teste_servo.py` (0° → 35° → 65°, como o seu teste)
-3. **Câmera** (no terminal da área de trabalho do Pi): `python3 calibrar_camera.py`. Meça a **altura da lente** e ponha em
+3. **Câmera sem tela** (SSH): `python3 teste_camera.py` mede o FPS, roda a detecção e salva `teste_camera_saida/quadro.jpg` e `bev.jpg`.
+   **Câmera com tela** (no terminal da área de trabalho do Pi): `python3 calibrar_camera.py`. Meça a **altura da lente** e ponha em
    `CAM_ALTURA_CM`; ajuste ao vivo (`w/s` inclinação, `r/f` altura, `t/g` campo de visão) até as linhas ficarem
    **retas e paralelas** na vista de cima; `p` grava `dados/camera.json`. (A câmera é a única medida física que importa.)
 4. **Sem mover nada**: `python3 principal.py --seco --ver`
@@ -181,3 +198,17 @@ desfoque e reflexo (39 corridas simuladas). A largura da pista é aprendida anda
   baixo); o carro ainda aprende sozinho se precisa de mais (`dados/motor.json`).
 - `python3 principal.py --maximo`: 100% o tempo todo, sem nenhuma freada (só nessa corrida).
 - `python3 principal.py --vel 0.6`: velocidade base mais baixa só nessa corrida.
+
+## Mudanças neste fork
+
+* **Fiação**: pinos do L298N e do servo conforme o carro (tabela acima).
+* **Relógio e latência**: `time.monotonic()` (o Pi não tem RTC e o NTP faz o relógio saltar) e o `step()` recebe o
+  instante de **captura** do quadro, não o de agora, então o `dt` do controle considera a latência da câmera/USB.
+* **Watchdog dos motores**: `Motores` para sozinho se nenhum comando chegar por 250 ms (laço travado).
+  Scripts que andam por um tempo usam `Motores.andar_por(velocidade, segundos)`, que renova o comando.
+* **Falha por quadro**: uma exceção em um quadro vira "faixa perdida" (volante decai, velocidade 0) em vez de derrubar a corrida.
+* **Debug no log**: a BEV e a máscara de debug só são geradas a cada `DEBUG_LOG_CADA` quadros quando há log e nenhuma janela.
+* **Scripts novos**: `frente.py`, `teste_pinos.py`, `teste_camera.py`.
+
+Não testado no carro: o simulador (`sim.py`) não passa por `principal.py` nem `hardware.py`. Valide com `--seco`,
+depois com o carro suspenso, antes de largar na pista.
