@@ -176,9 +176,9 @@ STANLEY_V0_CMS      = 12.0    # evita divisao por ~0 em baixa velocidade
 V_CMS_NA_VEL_1      = 80.0    # velocidade estimada (cm/s) com speed=1.0 (so p/ o controle)
 ESTERCO_MAX_GRAUS   = 28.0    # original
 PROA_PESO           = 1.0     # original
-ERRO_ZONA_MORTA_CM  = 1.5     # dentro de +-1.5 cm do alvo nao corrige (evita o volante 'tremendo')
+ERRO_ZONA_MORTA_CM  = 1.0     # dentro de +-1 cm do alvo nao corrige
 ESTERCO_SUAVIZACAO  = 0.55    # original
-ESTERCO_SLEW        = 3.0     # maximo de variacao do turn (-1..1) por segundo (era 6.0: batente a batente em 0.3 s)
+ESTERCO_SLEW        = 4.0     # volante: maximo de variacao por segundo (era 6.0). Escolhido por varredura no simulador
 ESTERCO_INVERTER    = False   # volante NAO invertido (o adapter antes trocava True->False, era esse o certo)
 
 # =====================================================================
@@ -328,11 +328,11 @@ MAX_FRAMES_SATURADO = 5       # ... por tantos quadros seguidos = rastreio furad
 # =====================================================================
 # 13. ESTABILIDADE DA MEDIDA (estabilidade.py): o volante nao pode 'seguir' cada pulo da leitura
 # =====================================================================
-ERRO_TAU_S            = 0.25   # constante de tempo do filtro do erro lateral (s). Maior = mais calmo, mais lento
-PROA_TAU_S            = 0.35   # idem pra proa (a medida mais ruidosa)
+ERRO_TAU_S            = 0.08   # filtro de tempo do erro (s). Maior = mais calmo, mas tira margem de estabilidade
+PROA_TAU_S            = 0.12   # idem pra proa (a medida mais ruidosa)
 PROA_MAX_GRAUS        = 20.0   # proa lida acima disso e quase sempre erro de leitura: limita
 MEDIDA_PULO_ERRO_CM   = 12.0   # mudanca de erro maior que isso entre quadros = suspeita: segura...
 MEDIDA_PULO_PROA_GRAUS = 15.0  # ... idem proa
 MEDIDA_PULO_QUADROS   = 3      # ... e so aceita se persistir por tantos quadros seguidos
-ESTERCO_TAU_S         = 0.20   # filtro de tempo do comando de volante (substitui ESTERCO_SUAVIZACAO)
-ESTERCO_TURN_MAX      = 0.90   # volante nunca passa de 90% do curso (o 100% so servia pra 'bater no batente')
+ESTERCO_TAU_S         = 0.12   # filtro de tempo do comando de volante
+ESTERCO_TURN_MAX      = 1.00   # curso inteiro liberado (0.9 reduziu a margem nas curvas)
