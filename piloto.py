@@ -47,6 +47,7 @@ class Piloto:
         self.curvatura = 0.0       # 1/cm, da faixa a frente (pra frear antes da curva)
         self.curvatura_sinal = 0.0 # idem COM SINAL (+ = faixa dobrando pra direita): descontar o giro da pista
         self.perdidos = 0
+        self.t_perdido = 0.0       # segundos seguidos sem faixa (a parada e por TEMPO, nao por quadros)
         self.motivo = "ok"
         self.eventos = []
         self._t_ant = None
@@ -115,6 +116,7 @@ class Piloto:
             if self.perdidos >= config.PERDIDO_QUADROS_DEVAGAR:
                 self.eventos.append("[pista] faixa reencontrada")
             self.perdidos = 0
+            self.t_perdido = 0.0
             self._perdido_avisado = False
             self.motivo = "ok"
             centro = res.centro
@@ -178,6 +180,7 @@ class Piloto:
                 turn = self.direcao.saida()        # volante invertido agora: a saida deste mesmo quadro ja sai certa
         else:
             self.perdidos += 1
+            self.t_perdido += dt
             self.motivo = res.motivo
             if self.perdidos >= config.PERDIDO_QUADROS_DEVAGAR:   # buraco curto: mantem o filtro (nao zera a cada falha)
                 self._erro_f = self._proa_f = None
@@ -187,14 +190,16 @@ class Piloto:
             self.plan.atualizar(dt, [], None, v_cms)
             if self.perdidos == 1:
                 self.eventos.append(f"[pista] perdi a faixa ({res.motivo})")
-            if self.perdidos >= config.PERDIDO_QUADROS_PARAR:
+            if self.t_perdido >= config.PERDIDO_PARAR_S:
                 if not self._perdido_avisado:
                     self.eventos.append("[pista] sem faixa ha muito tempo -> PAROU")
                     self._perdido_avisado = True
-                turn = self.direcao.decair(0.8)
+                turn = self.direcao.decair_tempo(dt, config.PARADO_TAU_S)
                 speed = 0.0
             else:
-                turn = self.direcao.decair(0.97)
+                # sem faixa: o volante VOLTA AO CENTRO rapido (em segundos, nao em quadros) e o carro segue
+                # devagar em linha reta, em vez de andar com o volante preso na ultima posicao
+                turn = self.direcao.decair_tempo(dt, config.PERDIDO_TAU_S)
                 speed = config.VELOCIDADE_PERDIDO
 
         # ate confirmar o sentido do volante: devagar. O limite vale ANTES do governador (ele precisa

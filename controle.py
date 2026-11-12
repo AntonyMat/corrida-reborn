@@ -62,6 +62,11 @@ class Direcao:
         self.turn = max(-tm, min(tm, novo))
         return self.saida()
 
+    def decair_tempo(self, dt, tau_s):
+        """Volta o volante ao centro com constante de tempo tau_s (segundos): igual em qualquer FPS."""
+        self.turn *= math.exp(-max(dt, 0.0) / max(tau_s, 1e-3))
+        return self.saida()
+
     def decair(self, fator=0.9):
         self.turn *= fator
         return self.saida()
