@@ -182,13 +182,13 @@ ESTERCO_INVERTER    = False   # volante NAO invertido (o adapter antes trocava T
 # =====================================================================
 # 8. VELOCIDADE (0..1)
 # =====================================================================
-VELOCIDADE_BASE     = 0.60     # menos velocidade (era 0.65) para fazer a curva
+VELOCIDADE_BASE     = 0.55    # era 0.60: na velocidade minima; sem sobra pra o carro perder a curva
 PISO_MOTOR_MIN      = 0.55    # POTENCIA MINIMA aos motores em QUALQUER situacao (pedido: pelo menos 55%);
                               # e o ponto de partida do que o carro aprende que ele precisa pra andar
 VELOCIDADE_MIN      = 0.58    # era 0.85: freia mais nas curvas    # piso de CRUZEIRO: nas curvas a freada nao desce disso
 VELOCIDADE_PERDIDO  = 0.55    # perdeu a faixa: anda no piso do motor (nao abaixo) ate parar
-ARRANQUE_VEL        = 0.90    # empurrao ao sair do repouso (vence o atrito)
-ARRANQUE_S          = 0.45    # duracao do empurrao
+ARRANQUE_VEL        = 0.65    # era 0.90: empurrao menor, servo tem tempo de virar antes do carro ganhar inercia
+ARRANQUE_S          = 0.15    # era 0.45: empurrao mais curto
 
 # Governador do motor (motor_auto.py): se mandou andar e a cena da camera nao muda,
 # o carro esta parado -> sobe o piso de potencia ate ele andar (e salva em dados/motor.json).
