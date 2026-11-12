@@ -169,11 +169,11 @@ OLHAR_ADIANTE_CM    = 50.0    # olha mais longe para ver curva antes (era 38 cm)
 # 7. CONTROLE (Stanley)
 #   volante = erro_de_proa + atan(K * erro_lateral / (V0 + v))
 # =====================================================================
-STANLEY_K           = 4.0     # vira mais forte quando longe do centro (era 3.0)
+STANLEY_K           = 6.0     # era 4.0: ganho lateral mais forte, o volante vai mais fundo
 STANLEY_V0_CMS      = 12.0    # evita divisao por ~0 em baixa velocidade
 V_CMS_NA_VEL_1      = 80.0    # velocidade estimada (cm/s) com speed=1.0 (so p/ o controle)
 ESTERCO_MAX_GRAUS   = 20.0    # esterco REAL maximo da roda deste carro (vira menos que 28 graus)    # esterco REAL maximo da roda (mede no carro)
-PROA_PESO           = 1.0     # peso do termo de proa
+PROA_PESO           = 0.4     # era 1.0: o termo de proa reduzia o volante quando o carro estava torto
 ERRO_ZONA_MORTA_CM  = 0.6
 ESTERCO_SUAVIZACAO  = 0.70    # era 0.55: responde mais rapido ao erro    # EMA do comando de volante (1 = sem filtro)
 ESTERCO_SLEW        = 6.0     # maximo de variacao do turn (-1..1) por segundo
