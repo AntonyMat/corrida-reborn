@@ -52,7 +52,7 @@ def main():
     ap.add_argument("--sem-autocal", action="store_true",
                     help="nao autocalibra a escala ao ligar")
     ap.add_argument("--maximo", action="store_true",
-                    help="SEMPRE 100% de potencia, sem nenhuma freada (curvas, torto, perdido)")
+                    help="SEMPRE 100%% de potencia, sem nenhuma freada (curvas, torto, perdido)")
     ap.add_argument("--recalibrar", action="store_true",
                     help="refaz a calibracao da direcao (o carro anda ~1,5 m)")
     ap.add_argument("--autocal", action="store_true",
