@@ -146,7 +146,7 @@ JANELA_MIN_PX       = 14
 LINHA_MIN_PTS       = 45      # pixels minimos pra aceitar uma linha
 LINHA_MIN_EXTENSAO_CM = 6.0   # comprimento minimo (cm) de tinta alinhada (um tracejado)
 LINHA_RESIDUO_MAX_CM = 3.0    # erro medio do ajuste acima disso = rejeita
-CURVA_GRAU2_EXTENSAO = 0.75   # era 0.6: so vira curva (parabola) com mais linha visivel, menos falso positivo
+CURVA_GRAU2_EXTENSAO = 0.6    # original
 
 LINHA_CURTA_FRAC     = 0.40   # linha com menos que isso da faixa visivel = 'curta' (so posicao, herda inclinacao)
 
@@ -163,19 +163,19 @@ PORTA_ABRE_CM           = 8.0     # a cada quadro sem faixa, a tolerancia ao ult
 RELIGAR_SEM_CENTRO_QUADROS = 30   # tantos quadros sem faixa = esquece o historico
 
 # onde olhar adiante pra decidir a direcao (distancia a frente do eixo, cm)
-OLHAR_ADIANTE_CM    = 55.0    # era 70: a 70 cm a BEV dava curva falsa; 55 e meio-termo
+OLHAR_ADIANTE_CM    = 38.0    # original
 
 # =====================================================================
 # 7. CONTROLE (Stanley)
 #   volante = erro_de_proa + atan(K * erro_lateral / (V0 + v))
 # =====================================================================
-STANLEY_K           = 2.5     # era 6.0: saturava o volante com erro pequeno (volante grudado num lado)
+STANLEY_K           = 2.2     # original
 STANLEY_V0_CMS      = 12.0    # evita divisao por ~0 em baixa velocidade
 V_CMS_NA_VEL_1      = 80.0    # velocidade estimada (cm/s) com speed=1.0 (so p/ o controle)
-ESTERCO_MAX_GRAUS   = 20.0    # esterco REAL maximo da roda deste carro (vira menos que 28 graus)    # esterco REAL maximo da roda (mede no carro)
-PROA_PESO           = 0.4     # era 1.0: o termo de proa reduzia o volante quando o carro estava torto
+ESTERCO_MAX_GRAUS   = 28.0    # original
+PROA_PESO           = 1.0     # original
 ERRO_ZONA_MORTA_CM  = 0.6
-ESTERCO_SUAVIZACAO  = 0.70    # era 0.55: responde mais rapido ao erro    # EMA do comando de volante (1 = sem filtro)
+ESTERCO_SUAVIZACAO  = 0.55    # original
 ESTERCO_SLEW        = 6.0     # maximo de variacao do turn (-1..1) por segundo
 ESTERCO_INVERTER    = False   # volante NAO invertido (o adapter antes trocava True->False, era esse o certo)
 
@@ -205,11 +205,11 @@ PISO_PASSO          = 0.05
 PISO_SALVAR_MAX     = 0.75    # nunca grava em dados/motor.json um piso acima disso (provavel aprendizado falso)
 PISO_MAX            = 0.95    # teto com prova forte
 PISO_MAX_FRACO      = 0.70    # teto com prova fraca (reta lisa parece parada); so vale com potencia < STALL_FRACO_VEL_MAX
-VEL_REDUCAO_CURVA   = 0.25     # freia mais com volante virado (era 0.12)
+VEL_REDUCAO_CURVA   = 0.12    # original
 VEL_REDUCAO_INCERTO = 0.15    # tira ate isso quando a proa/erro estao grandes (carro torto na pista)
 INCERTO_PROA_GRAUS  = 25.0    # proa que conta como 'torto' total
 INCERTO_ERRO_CM     = 18.0    # erro lateral que conta como 'longe' total
-VEL_REDUCAO_CURVATURA = 0.35  # era 0.50: menos freada falsa em reta onde o detector 've' curva ruidosa
+VEL_REDUCAO_CURVATURA = 0.20  # original
 CURVATURA_CHEIA     = 0.010   # curvatura (1/cm) que conta como 'curva fechada' total (raio 100 cm)
 VEL_REDUCAO_CONE    = 0.25    # tira ate isso com cone bem perto
 FPS_MINIMO          = 12.0    # abaixo disso o carro reduz a velocidade (freio automatico por FPS baixo)
@@ -217,7 +217,7 @@ QUADRO_VELHO_S      = 0.5     # quadro mais velho que isso = para
 
 # perdeu as faixas
 PERDIDO_QUADROS_DEVAGAR = 6   # anda devagar segurando o volante
-PERDIDO_QUADROS_PARAR   = 20    # persiste mais sem faixa antes de parar (era 12)
+PERDIDO_QUADROS_PARAR   = 12    # original
 
 # =====================================================================
 # 9. CONES

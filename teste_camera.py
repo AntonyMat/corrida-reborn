@@ -13,6 +13,8 @@ Abra os dois (scp pro PC, ou pelo desktop do Pi) e confira se as linhas da pista
 """
 
 import argparse
+import math
+import statistics
 import os
 import time
 
@@ -62,10 +64,11 @@ def main():
         print(f"Geometria ({origem}): {piloto.cam.resumo()}")
 
         ok = 0
+        erros, proas = [], []
         motivos = {}
         ultimo = -1
         t = time.monotonic()
-        for _ in range(10):
+        for _ in range(20):
             while True:
                 f, idx, _ = th.read()
                 if idx != ultimo:
@@ -77,13 +80,19 @@ def main():
             piloto.step(t, frame, fps=fps, debug=True)
             if piloto.motivo == "ok":
                 ok += 1
+                erros.append(piloto.erro_cm)
+                proas.append(piloto.proa_graus)
+                r = piloto.res
+                inc = " ".join(f"{l.ident or '?'}:{l.x_ref:+.0f}cm/{math.degrees(math.atan(l.inclinacao(piloto.faixas._y_ref()))):+.0f}deg"
+                               for l in r.linhas)
+                print(f"  quadro {len(erros):2d}: erro {piloto.erro_cm:+6.1f}cm proa {piloto.proa_graus:+6.1f}deg | linhas {inc}")
             else:
                 motivos[piloto.motivo] = motivos.get(piloto.motivo, 0) + 1
 
         os.makedirs(PASTA, exist_ok=True)
         cv2.imwrite(os.path.join(PASTA, "quadro.jpg"), piloto.frame_proc)
         cv2.imwrite(os.path.join(PASTA, "bev.jpg"), visual.desenhar_bev(piloto))
-        print(f"Faixa lida em {ok}/10 quadros", end="")
+        print(f"Faixa lida em {ok}/20 quadros", end="")
         if motivos:
             print("  (falhas: " + ", ".join(f"{m} x{n}" for m, n in motivos.items()) + ")")
         else:
@@ -91,6 +100,12 @@ def main():
         r = piloto.res
         if r is not None and r.linhas:
             print("Linhas: " + " ".join(f"{l.ident or '?'}:{l.x_ref:+.0f}cm({l.classe or '?'})" for l in r.linhas))
+        if len(proas) >= 3:
+            print(f"RESUMO com o carro PARADO e RETO na faixa: erro medio {statistics.mean(erros):+.1f}cm "
+                  f"(desvio {statistics.pstdev(erros):.1f}) | proa media {statistics.mean(proas):+.1f}deg "
+                  f"(desvio {statistics.pstdev(proas):.1f})")
+            print("  -> carro reto na pista: proa deve ser ~0 (+-5) e o desvio pequeno (<3). "
+                  "Proa grande ou instavel = a LEITURA da faixa esta errada (camera/geometria), nao o controle.")
         print(f"Imagens salvas em {os.path.abspath(PASTA)}/ (quadro.jpg e bev.jpg)")
         if ok == 0:
             print("Nao achou a faixa: confira se a camera aponta pra pista, a luz, e a altura/inclinacao "
