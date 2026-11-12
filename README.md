@@ -208,7 +208,7 @@ python3 principal.py --web            # abre um servidor na porta 8080
 Abra `http://<ip-do-pi>:8080` no PC ou no celular (mesma rede do Pi): câmera com a linha-alvo | vista de cima com as
 linhas achadas (A/D/B) e o centro da faixa, mais erro, proa, volante e velocidade. Só gasta CPU com o navegador aberto.
 O endereço é impresso ao iniciar. Qualquer pessoa na rede local pode ver o vídeo (somente leitura). Com tela no próprio
-Pi, `--ver` abre uma janela. Funciona junto com `--seco`.
+Pi, `--ver` abre uma janela **na tela do próprio Pi**, mesmo vindo de um terminal remoto (ele procura a área de trabalho aberta no Pi; precisa de monitor ligado e sessão aberta). Se a janela falhar, a corrida segue sem ela. Ambos funcionam junto com `--seco`.
 
 ## Calibrar a câmera sem tela (`calibrar_geometria.py`)
 

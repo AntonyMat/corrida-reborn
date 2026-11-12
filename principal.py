@@ -78,10 +78,12 @@ def main():
         print(f"Velocidade base desta corrida: {config.VELOCIDADE_BASE:.2f}")
 
     ver = a.ver
-    if ver and os.name != "nt" and not os.environ.get("DISPLAY"):
-        print("Sem tela neste terminal (DISPLAY vazio): janelas desligadas. "
-              "Rode pelo terminal da area de trabalho do Pi.")
+    if ver and not _achar_tela():
+        print("Nao achei a tela do Pi (nenhuma area de trabalho aberta?). Ligue o Pi a um monitor com a area de "
+              "trabalho aberta, ou use --web pra ver no navegador. Janela desligada.")
         ver = False
+    elif ver:
+        print(f"Janela na tela do Pi (DISPLAY={os.environ.get('DISPLAY', '-')}). 'q' na janela para parar.")
 
     params, origem = carregar_parametros()
     piso_salvo = hardware.carregar_piso() if config.MOTOR_PISO_APRENDER else None
@@ -205,6 +207,7 @@ def main():
     if registro:
         print(f"Log em {registro.pasta}")
 
+    janela_ok = False
     tx = None
     if a.web:
         try:
@@ -275,9 +278,22 @@ def main():
                 _resumo(piloto, fps_medido, servo)
 
             if mostrar:
-                cv2.imshow("reborn-autonomos", visual.compor(piloto, frame))
-                if (cv2.waitKey(1) & 0xFF) == ord('q'):
-                    break
+                try:
+                    img = visual.compor(piloto, frame)
+                    if config.VER_ESCALA != 1.0:
+                        img = cv2.resize(img, None, fx=config.VER_ESCALA, fy=config.VER_ESCALA,
+                                         interpolation=cv2.INTER_NEAREST)
+                    if not janela_ok:
+                        cv2.namedWindow("reborn-autonomos", cv2.WINDOW_NORMAL)
+                        janela_ok = True
+                    cv2.imshow("reborn-autonomos", img)
+                    if (cv2.waitKey(1) & 0xFF) == ord('q'):
+                        break
+                except cv2.error as e:     # janela nao abre: avisa e SEGUE a corrida (so sem a janela)
+                    print("  (nao consegui abrir a janela na tela do Pi: "
+                          f"{str(e).splitlines()[0][:110]}). Sigo sem ela. Dica: DISPLAY=:0 python3 principal.py --ver, "
+                          "com a area de trabalho aberta no Pi; ou use --web.")
+                    ver = False
             if a.tempo and time.monotonic() - t_ini >= a.tempo:
                 print(f"Tempo de {a.tempo:.0f}s acabou.")
                 break
@@ -313,6 +329,20 @@ def main():
         except cv2.error:
             pass
         print("Desligado com seguranca.")
+
+
+def _achar_tela():
+    """True se da pra abrir janela. Vindo de terminal remoto (DISPLAY vazio) tenta a tela do PROPRIO Pi:
+    se ha uma area de trabalho aberta nele, existe o socket do X em /tmp/.X11-unix."""
+    if os.name == "nt":
+        return True
+    if os.environ.get("DISPLAY"):
+        return True
+    for n in ("0", "1"):
+        if os.path.exists(f"/tmp/.X11-unix/X{n}"):
+            os.environ["DISPLAY"] = f":{n}"
+            return True
+    return False
 
 
 def _resumo(p, fps, servo=None):

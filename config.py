@@ -263,6 +263,7 @@ CONE_FRENAGEM_ALCANCE_CM = 60.0
 # 11. DEPURACAO
 # =====================================================================
 DEBUG_LOG_CADA = 5        # com log ligado (sem janela), gera BEV/mascara de debug a cada N quadros
+VER_ESCALA = 2.0              # --ver: aumenta a janela (a imagem original tem so ~560x250 px)
 WEB_CADA = 3                  # --web: manda 1 de cada N quadros pro navegador (so gasta CPU com alguem vendo)
 DEBUG_CADA = 2            # --ver: desenha a cada N quadros
 LOG_PASTA = "logs"
