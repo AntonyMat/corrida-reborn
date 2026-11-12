@@ -269,6 +269,9 @@ LOG_PASTA = "logs"
 # 12. ADAPTACAO ANDANDO (adaptacao.py): o carro larga na hora e se calibra em movimento
 # =====================================================================
 ADAPTACAO = True
+ADAPT_TRAVAR_INVERTER = True   # NAO permite que a adaptacao troque o sentido do volante
+                               # (ESTERCO_INVERTER do config.py manda). Impede oscilacao
+                               # quando o carro sai da pista e o detector se confunde.
 CARRO_ENTREEIXOS_CM = 20.0    # distancia entre eixos (so da a escala do ganho nominal da direcao)
 ADAPT_TAU_S = 2.0             # memoria da regressao (esquecimento)
 ADAPT_JANELA_S = 0.35         # janela curta pra medir o giro (inclinacao da proa)
@@ -306,7 +309,7 @@ LADO_MARGEM = 0.15            # diferenca de cobertura (continua x pontilhada) q
 LADO_TAU_S = 0.10             # suavizacao (em TEMPO) da evidencia de lado
 LADO_TROCA_S = 0.30           # evidencia contraria por este tempo = espelha
 LADO_TRAVA_S = 3.0            # evidencia a favor por este tempo = trava a decisao
-ESPELHO_COOLDOWN_S = 2.0      # apos espelhar, pede 2x LADO_MARGEM pra re-espelhar durante este tempo
+ESPELHO_COOLDOWN_S = 4.0      # apos espelhar, pede 2x LADO_MARGEM pra re-espelhar durante este tempo
 
 # =====================================================================
 # 13. PROTECOES (mesmas ideias do gatuno-rapido)

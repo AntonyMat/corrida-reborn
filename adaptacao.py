@@ -234,6 +234,11 @@ class Adaptacao:
 
     def _inverter(self, t, motivo):
         d = self.p.direcao
+        if getattr(config, "ADAPT_TRAVAR_INVERTER", False):
+            # Travado por config: so marca como confirmado e ignora.
+            self.confirmada = True
+            self.eventos.append(f"[auto] queria inverter o volante ({motivo}) mas esta TRAVADO no config")
+            return
         d.inverter = not d.inverter      # o comando logico fica: so o sinal FISICO muda, na hora
         self.virou_agora = True
         self._t_flip = t
