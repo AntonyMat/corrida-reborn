@@ -165,23 +165,23 @@ OLHAR_ADIANTE_CM    = 38.0
 # 7. CONTROLE (Stanley)
 #   volante = erro_de_proa + atan(K * erro_lateral / (V0 + v))
 # =====================================================================
-STANLEY_K           = 2.2
+STANLEY_K           = 3.0    # mais ganho lateral: vira mais forte quando esta longe do centro
 STANLEY_V0_CMS      = 12.0    # evita divisao por ~0 em baixa velocidade
 V_CMS_NA_VEL_1      = 80.0    # velocidade estimada (cm/s) com speed=1.0 (so p/ o controle)
-ESTERCO_MAX_GRAUS   = 28.0    # esterco REAL maximo da roda (mede no carro)
+ESTERCO_MAX_GRAUS   = 20.0    # esterco REAL maximo da roda deste carro (vira menos que 28 graus)    # esterco REAL maximo da roda (mede no carro)
 PROA_PESO           = 1.0     # peso do termo de proa
 ERRO_ZONA_MORTA_CM  = 0.6
-ESTERCO_SUAVIZACAO  = 0.55    # EMA do comando de volante (1 = sem filtro)
+ESTERCO_SUAVIZACAO  = 0.70    # era 0.55: responde mais rapido ao erro    # EMA do comando de volante (1 = sem filtro)
 ESTERCO_SLEW        = 6.0     # maximo de variacao do turn (-1..1) por segundo
 ESTERCO_INVERTER    = False    # o volante deste carro esterca pro lado oposto ao esperado (visto no teste)
 
 # =====================================================================
 # 8. VELOCIDADE (0..1)
 # =====================================================================
-VELOCIDADE_BASE     = 1.00    # MAXIMA nas retas (o carro ainda freia antes das curvas)
+VELOCIDADE_BASE     = 0.65    # era 1.00: menos velocidade nas retas enquanto afina a curva    # MAXIMA nas retas (o carro ainda freia antes das curvas)
 PISO_MOTOR_MIN      = 0.55    # POTENCIA MINIMA aos motores em QUALQUER situacao (pedido: pelo menos 55%);
                               # e o ponto de partida do que o carro aprende que ele precisa pra andar
-VELOCIDADE_MIN      = 0.85    # piso de CRUZEIRO: nas curvas a freada nao desce disso
+VELOCIDADE_MIN      = 0.58    # era 0.85: freia mais nas curvas    # piso de CRUZEIRO: nas curvas a freada nao desce disso
 VELOCIDADE_PERDIDO  = 0.55    # perdeu a faixa: anda no piso do motor (nao abaixo) ate parar
 ARRANQUE_VEL        = 0.90    # empurrao ao sair do repouso (vence o atrito)
 ARRANQUE_S          = 0.45    # duracao do empurrao
