@@ -289,13 +289,15 @@ class Motores:
         if qual == "A":
             in1, in2, pwm = config.IN1, config.IN2, self.pwm_a
             inv = config.MOTOR_A_INVERTIDO
+            fator = max(0.0, min(1.0, config.MOTOR_A_FATOR))
         else:
             in1, in2, pwm = config.IN3, config.IN4, self.pwm_b
             inv = config.MOTOR_B_INVERTIDO
+            fator = max(0.0, min(1.0, config.MOTOR_B_FATOR))
         frente = (speed >= 0) != inv
         G.output(in1, G.HIGH if frente else G.LOW)
         G.output(in2, G.LOW if frente else G.HIGH)
-        pwm.ChangeDutyCycle(abs(speed) * 100.0)
+        pwm.ChangeDutyCycle(abs(speed) * 100.0 * fator)
 
     def andar(self, speed):
         self._t_cmd = time.monotonic()

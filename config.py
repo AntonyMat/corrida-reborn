@@ -32,6 +32,10 @@ IN4 = 21                # direito (pino fisico 40)
 MOTOR_PWM_HZ = 100
 MOTOR_A_INVERTIDO = False   # se um motor girar pro lado errado, troque aqui
 MOTOR_B_INVERTIDO = False   # (em vez de trocar fios)
+# Balanco dos motores: se um puxa mais que o outro (carro desvia mesmo com volante centrado),
+# baixe o FATOR do motor mais FORTE (ex: 0.90). NAO suba acima de 1.0 - nao da pra pedir mais que 100%.
+MOTOR_A_FATOR = 1.0         # multiplica a potencia do ESQUERDO (canal A); 0.0..1.0
+MOTOR_B_FATOR = 1.0         # multiplica a potencia do DIREITO  (canal B); 0.0..1.0
 
 # =====================================================================
 # 2. SERVO (graus) - valores de PARTIDA. Os valores reais saem do
