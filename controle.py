@@ -54,11 +54,12 @@ class Direcao:
         self.delta_graus = math.degrees(delta)
         self.termos = (math.degrees(t_proa), math.degrees(t_lat))
         alvo = max(-1.0, min(1.0, self.ganho * self.delta_graus / config.ESTERCO_MAX_GRAUS))
-        a = config.ESTERCO_SUAVIZACAO
+        a = 1.0 - math.exp(-max(dt, 1e-3) / max(config.ESTERCO_TAU_S, 1e-3))     # filtro em TEMPO (igual em qualquer FPS)
         novo = a * alvo + (1 - a) * self.turn
         passo = config.ESTERCO_SLEW * dt
         novo = max(self.turn - passo, min(self.turn + passo, novo))
-        self.turn = max(-1.0, min(1.0, novo))
+        tm = config.ESTERCO_TURN_MAX
+        self.turn = max(-tm, min(tm, novo))
         return self.saida()
 
     def decair(self, fator=0.9):

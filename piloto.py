@@ -24,6 +24,7 @@ from faixas import DetectorFaixas
 from cones import DetectorCones, RastreadorCones
 from planejador import Planejador
 from controle import Direcao, velocidade
+from estabilidade import MedidaEstavel
 from motor_auto import GovernadorMotor, pequeno_cinza
 from adaptacao import Adaptacao
 
@@ -58,6 +59,9 @@ class Piloto:
         self._sat = 0              # quadros seguidos com o erro colado no maximo (rastreio furado)
         self._erro_f = None        # erro e proa SUAVIZADOS (o Stanley usa estes)
         self._proa_f = None
+        self.f_erro = MedidaEstavel(config.ERRO_TAU_S, config.MEDIDA_PULO_ERRO_CM, config.MEDIDA_PULO_QUADROS)
+        self.f_proa = MedidaEstavel(config.PROA_TAU_S, config.MEDIDA_PULO_PROA_GRAUS, config.MEDIDA_PULO_QUADROS,
+                                    limite=config.PROA_MAX_GRAUS)
         self._t_ok0 = None         # instante da primeira leitura boa da faixa
         self._n_ok = 0             # quadros com faixa lida desde a largada (olha antes de manobrar)
         self.adapt = Adaptacao(self)   # calibracao ANDANDO: sentido do volante, puxao, ganho, lado da continua
@@ -146,13 +150,10 @@ class Piloto:
                 self.curvatura = 0.5 * self.curvatura + 0.5 * abs(ks)
                 self.curvatura_sinal = 0.5 * self.curvatura_sinal + 0.5 * ks
 
-            # erro e proa SUAVIZADOS (media movel exponencial): tira o tremido de uma leitura isolada
-            if self._erro_f is None:
-                self._erro_f, self._proa_f = erro, proa
-            else:
-                a_s = config.ERRO_SUAV
-                self._erro_f = a_s * erro + (1.0 - a_s) * self._erro_f
-                self._proa_f = a_s * proa + (1.0 - a_s) * self._proa_f
+            # erro e proa ESTABILIZADOS (limite + mediana de 3 + portao de pulo + filtro em tempo):
+            # um quadro com a faixa lida errada nao chega ao volante
+            self._erro_f = self.f_erro.atualizar(erro, dt)
+            self._proa_f = math.radians(self.f_proa.atualizar(math.degrees(proa), dt))
             turn = self.direcao.atualizar(dt, self._erro_f, self._proa_f, v_cms)
             self._n_ok += 1
             if self._t_ok0 is None:
@@ -178,7 +179,10 @@ class Piloto:
         else:
             self.perdidos += 1
             self.motivo = res.motivo
-            self._erro_f = self._proa_f = None      # leitura nova depois do buraco: sem misturar com a velha
+            if self.perdidos >= config.PERDIDO_QUADROS_DEVAGAR:   # buraco curto: mantem o filtro (nao zera a cada falha)
+                self._erro_f = self._proa_f = None
+                self.f_erro.reset()
+                self.f_proa.reset()
             self.adapt.sem_leitura()
             self.plan.atualizar(dt, [], None, v_cms)
             if self.perdidos == 1:

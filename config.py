@@ -176,9 +176,9 @@ STANLEY_V0_CMS      = 12.0    # evita divisao por ~0 em baixa velocidade
 V_CMS_NA_VEL_1      = 80.0    # velocidade estimada (cm/s) com speed=1.0 (so p/ o controle)
 ESTERCO_MAX_GRAUS   = 28.0    # original
 PROA_PESO           = 1.0     # original
-ERRO_ZONA_MORTA_CM  = 0.6
+ERRO_ZONA_MORTA_CM  = 1.5     # dentro de +-1.5 cm do alvo nao corrige (evita o volante 'tremendo')
 ESTERCO_SUAVIZACAO  = 0.55    # original
-ESTERCO_SLEW        = 6.0     # maximo de variacao do turn (-1..1) por segundo
+ESTERCO_SLEW        = 3.0     # maximo de variacao do turn (-1..1) por segundo (era 6.0: batente a batente em 0.3 s)
 ESTERCO_INVERTER    = False   # volante NAO invertido (o adapter antes trocava True->False, era esse o certo)
 
 # =====================================================================
@@ -324,3 +324,15 @@ ESPELHO_COOLDOWN_S = 4.0      # apos espelhar, pede 2x LADO_MARGEM pra re-espelh
 ERRO_SUAV = 0.70              # erro/proa suavizados: peso da leitura nova (menor = mais suave)
 SAT_ERRO_FRAC = 0.90          # erro >= isto x largura da faixa = "colado no maximo"
 MAX_FRAMES_SATURADO = 5       # ... por tantos quadros seguidos = rastreio furado: reinicia e conta como perdida
+
+# =====================================================================
+# 13. ESTABILIDADE DA MEDIDA (estabilidade.py): o volante nao pode 'seguir' cada pulo da leitura
+# =====================================================================
+ERRO_TAU_S            = 0.25   # constante de tempo do filtro do erro lateral (s). Maior = mais calmo, mais lento
+PROA_TAU_S            = 0.35   # idem pra proa (a medida mais ruidosa)
+PROA_MAX_GRAUS        = 20.0   # proa lida acima disso e quase sempre erro de leitura: limita
+MEDIDA_PULO_ERRO_CM   = 12.0   # mudanca de erro maior que isso entre quadros = suspeita: segura...
+MEDIDA_PULO_PROA_GRAUS = 15.0  # ... idem proa
+MEDIDA_PULO_QUADROS   = 3      # ... e so aceita se persistir por tantos quadros seguidos
+ESTERCO_TAU_S         = 0.20   # filtro de tempo do comando de volante (substitui ESTERCO_SUAVIZACAO)
+ESTERCO_TURN_MAX      = 0.90   # volante nunca passa de 90% do curso (o 100% so servia pra 'bater no batente')
