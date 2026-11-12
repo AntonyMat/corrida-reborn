@@ -219,7 +219,7 @@ QUADRO_VELHO_S      = 0.5     # quadro mais velho que isso = para
 
 # perdeu as faixas
 PERDIDO_QUADROS_DEVAGAR = 6   # anda devagar segurando o volante
-PERDIDO_QUADROS_PARAR   = 12    # original
+PERDIDO_QUADROS_PARAR   = 40    # era 12 (0.5 s): parava a cada falha da faixa e reiniciava. Agora segue devagar ~2 s (VELOCIDADE_PERDIDO) antes de parar
 
 # =====================================================================
 # 9. CONES
