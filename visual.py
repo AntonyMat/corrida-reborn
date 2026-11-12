@@ -15,6 +15,10 @@ def _txt(img, texto, pos, cor=(255, 255, 255), esc=0.45):
     cv2.putText(img, texto, pos, cv2.FONT_HERSHEY_SIMPLEX, esc, cor, 1, cv2.LINE_AA)
 
 
+def _simples(piloto):
+    return getattr(config, "MODO_PILOTO", "") == "simples" and getattr(piloto, "seg", None) is not None
+
+
 def desenhar_bev(piloto, escala=1.0):
     cam, res = piloto.cam, piloto.res
     if res is None or res.bev is None:
@@ -40,12 +44,25 @@ def desenhar_bev(piloto, escala=1.0):
         u, v = cam.chao_para_bev(float(l.x(Ys[len(Ys) // 2])), float(Ys[len(Ys) // 2]))
         rot = (l.ident or "?") + ("" if l.cob_ema is None else f" {l.cob_ema:.2f}")
         _txt(img, rot, (int(u) + 4, int(v)), COR_IDENT.get(l.ident), 0.38)
-    if res.centro is not None:
+    if res.centro is not None and not _simples(piloto):
         pts = np.array([cam.chao_para_bev(float(res.centro.x(yy)), float(yy)) for yy in Ys], np.int32)
         cv2.polylines(img, [pts], False, (0, 255, 0), 2, cv2.LINE_AA)
         o = getattr(piloto, 'deslocamento_cm', piloto.plan.o_cmd)
         pts2 = np.array([cam.chao_para_bev(float(res.centro.x(yy)) + o, float(yy)) for yy in Ys], np.int32)
         cv2.polylines(img, [pts2], False, (0, 255, 255), 2, cv2.LINE_AA)
+    seg = getattr(piloto, "seg", None)
+    if seg is not None and getattr(config, "MODO_PILOTO", "") == "simples" and piloto.motivo == "ok" and seg.cx is not None:
+        Ys2 = np.linspace(cam.y_min, cam.y_max, 30)
+        for l, cor in ((seg.esq, (255, 160, 0)), (seg.dir, (0, 200, 255))):     # pontilhada azul, continua laranja
+            if l is not None:
+                pts = np.array([cam.chao_para_bev(float(l.x(yy)), float(yy)) for yy in Ys2], np.int32)
+                cv2.polylines(img, [pts], False, cor, 3, cv2.LINE_AA)
+        pts = np.array([cam.chao_para_bev(float(seg.cx(yy)), float(yy)) for yy in Ys2], np.int32)
+        cv2.polylines(img, [pts], False, (0, 255, 255), 1, cv2.LINE_AA)
+        if seg.alvo is not None:
+            u, v = cam.chao_para_bev(*seg.alvo)
+            cv2.circle(img, (int(u), int(v)), 6, (0, 0, 255), -1, cv2.LINE_AA)
+        _txt(img, f"simples: {seg.lados}  W {seg.W:.0f}cm", (4, 30), (0, 255, 255), 0.4)
     for c in piloto.cones:
         u, v = cam.chao_para_bev(c.x, c.y)
         r = int(config.CONE_LARGURA_CM / 2 * cam.px_cm)
@@ -70,11 +87,17 @@ def desenhar_camera(piloto, frame):
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 255), 2)
         _txt(img, f"#{c.id} x{c.x:+.0f} y{c.y:.0f}", (x, max(10, y - 4)), (0, 255, 255), 0.4)
     res = piloto.res
-    if res is not None and res.centro is not None:
+    seg = getattr(piloto, "seg", None)
+    if _simples(piloto):
+        cx = seg.cx if (seg is not None and piloto.motivo == "ok") else None
+    else:
+        cx = (lambda yy: res.centro.x(yy) + getattr(piloto, 'deslocamento_cm', piloto.plan.o_cmd)) \
+            if (res is not None and res.centro is not None) else None
+    if cx is not None:
         Ys = np.linspace(cam.y_min, cam.y_max, 20)
         pts = []
         for yy in Ys:
-            p = cam.chao_para_pixel(float(res.centro.x(yy) + getattr(piloto, 'deslocamento_cm', piloto.plan.o_cmd)), float(yy))
+            p = cam.chao_para_pixel(float(cx(yy)), float(yy))
             if p is not None:
                 pts.append(p)
         if len(pts) > 1:

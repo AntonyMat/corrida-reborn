@@ -341,3 +341,20 @@ MEDIDA_PULO_PROA_GRAUS = 15.0  # ... idem proa
 MEDIDA_PULO_QUADROS   = 3      # ... e so aceita se persistir por tantos quadros seguidos
 ESTERCO_TAU_S         = 0.12   # filtro de tempo do comando de volante
 ESTERCO_TURN_MAX      = 1.00   # curso inteiro liberado (0.9 reduziu a margem nas curvas)
+
+# =====================================================================
+# 14. MODO DE PILOTAGEM
+#   "simples" : seguidor.py - fica SEMPRE entre a pontilhada (esq) e a continua (dir), volante por pure pursuit.
+#               Sem aprendizado andando, sem governador de motor. Recomendado.
+#   "completo": o pipeline antigo (Stanley + adaptacao + identificacao A/D/B + governador).
+# =====================================================================
+MODO_PILOTO          = "simples"
+LINHA_INCLIN_MAX     = 2.2    # inclinacao maxima de linha aceita (dX/dY). 2.2 = ~65 graus: pega curva fechada.
+                              # Era 1.2 (~50 graus): em curva de raio ~80 cm a linha sumia. Linha atravessada (90) segue rejeitada
+SEG_OLHAR_CM         = 45.0   # ponto-alvo no centro da faixa, tantos cm a frente. Maior = mais suave, menos reativo
+SEG_GANHO            = 1.0    # multiplica o angulo do pure pursuit (1.0 = geometria pura)
+SEG_ALVO_TAU_S       = 0.10   # filtro do ponto-alvo (s)
+SEG_PULO_CM          = 12.0   # ponto-alvo que pula mais que isso entre quadros = suspeito (segura ate confirmar)
+SEG_SLEW             = 4.0    # volante: variacao maxima por segundo
+SEG_FREIO_CURVA      = 0.20   # tira ate isso da velocidade com o volante todo virado
+SEG_DESLOCAMENTO_CM  = 0.0    # 0 = exatamente no meio entre as linhas; + = mais pra direita

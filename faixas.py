@@ -28,6 +28,8 @@ import numpy as np
 
 import config
 
+_DMAX = config.LINHA_INCLIN_MAX + 0.1     # inclinacao maxima (dX/dY) usada ao estender uma linha
+
 
 class Linha:
     """Uma linha do chao: X = poly(Y), valida em [y0, y1] (cm)."""
@@ -53,14 +55,14 @@ class Linha:
             der = np.polyval(np.polyder(self.coef), Yc)
         else:
             der = np.full_like(Yc, self.coef[0])
-        der = np.clip(der, -1.3, 1.3)
+        der = np.clip(der, -_DMAX, _DMAX)
         return base + der * (Y - Yc)
 
     def inclinacao(self, Y):
         Yc = np.clip(Y, self.y0, self.y1)
         if len(self.coef) > 2:
-            return float(np.clip(np.polyval(np.polyder(self.coef), Yc), -1.3, 1.3))
-        return float(np.clip(self.coef[0], -1.3, 1.3))
+            return float(np.clip(np.polyval(np.polyder(self.coef), Yc), -_DMAX, _DMAX))
+        return float(np.clip(self.coef[0], -_DMAX, _DMAX))
 
 
 def espacamento_perp(la, lb, y):
@@ -87,12 +89,12 @@ class Centro:
         Yc = np.clip(Y, self.y0, self.y1)
         base = np.polyval(self.coef, Yc)
         der = np.polyval(np.polyder(self.coef), Yc) if self.grau >= 2 else self.coef[0]
-        return base + np.clip(der, -1.3, 1.3) * (Y - Yc)
+        return base + np.clip(der, -_DMAX, _DMAX) * (Y - Yc)
 
     def inclinacao(self, Y):
         Yc = np.clip(Y, self.y0, self.y1)
         der = np.polyval(np.polyder(self.coef), Yc) if self.grau >= 2 else self.coef[0]
-        return float(np.clip(der, -1.3, 1.3))
+        return float(np.clip(der, -_DMAX, _DMAX))
 
 
 class ResultadoFaixas:
@@ -245,7 +247,8 @@ class DetectorFaixas:
         Y = cam.y_max - ys / cam.px_cm
         linhas = []
         y_ref = 0.5 * (cam.y_min + cam.y_max)
-        slopes = np.linspace(-1.2, 1.2, 49)
+        smax = config.LINHA_INCLIN_MAX
+        slopes = np.linspace(-smax, smax, int(round(smax / 0.05)) * 2 + 1)
         res_x = 1.0                                         # cm por bin
         margem = config.JANELA_MARGEM_CM
         kernel = np.ones((1, 5), np.float32) / 5.0
@@ -258,7 +261,7 @@ class DetectorFaixas:
                 idx_sub = self.rng.choice(X.size, 5000, replace=False)
             Xs, Ys = X[idx_sub], Y[idx_sub]
             x0 = Xs[None, :] - slopes[:, None] * (Ys[None, :] - y_ref)      # (S, N)
-            lim = cam.x_max + 1.2 * (cam.y_max - cam.y_min) + 2
+            lim = cam.x_max + smax * (cam.y_max - cam.y_min) + 2
             nb = int(2 * lim / res_x) + 1
             ib = np.clip(((x0 + lim) / res_x).astype(np.int32), 0, nb - 1)
             flat = (np.arange(len(slopes))[:, None] * nb + ib).ravel()
@@ -307,7 +310,7 @@ class DetectorFaixas:
             return None
         if residuo > config.LINHA_RESIDUO_MAX_CM:
             return None
-        if abs(float(np.polyval(np.polyder(coef), 0.5 * (y0 + y1)))) > 1.15:
+        if abs(float(np.polyval(np.polyder(coef), 0.5 * (y0 + y1)))) > config.LINHA_INCLIN_MAX - 0.05:
             return None                            # quase deitada: nao e linha da pista
         return Linha(coef, y0, y1, int(sel.sum()), residuo)
 

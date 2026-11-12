@@ -238,10 +238,24 @@ def cenario(nome):
         return Pista([(150, 0.0), (180, -1 / 130.0), (200, 0.0)], espelhada=True), dict()
     if nome == "curva_cone":
         return Pista([(120, 0.0), (220, 1 / 150.0), (200, 0.0)], cones=[(260, 2)]), dict()
+    if nome == "curva_fechada_dir":    # raio 80 cm
+        return Pista([(120, 0.0), (160, 1 / 80.0), (200, 0.0)]), dict()
+    if nome == "curva_fechada_esq":
+        return Pista([(120, 0.0), (160, -1 / 80.0), (200, 0.0)]), dict()
+    if nome == "curva_s":              # direita e logo esquerda, raio 100 cm
+        return Pista([(120, 0.0), (150, 1 / 100.0), (150, -1 / 100.0), (150, 0.0)]), dict()
+    if nome == "volta_oval":           # duas retas e duas curvas de 180 graus (raio 100 cm), sentido horario
+        return Pista([(200, 0.0), (math.pi * 100, 1 / 100.0), (300, 0.0), (math.pi * 100, 1 / 100.0), (150, 0.0)]), dict()
+    if nome == "largada_torta":        # comeca 8 cm fora do centro e 12 graus torto
+        return Pista([(150, 0.0), (180, 1 / 130.0), (200, 0.0)]), dict(d0=8, psi0=math.radians(-12))
+    if nome == "curva_fechada_traco_raro":
+        return Pista([(120, 0.0), (160, -1 / 80.0), (200, 0.0)], traco=(7.0, 45.0)), dict()
     raise SystemExit(f"cenario desconhecido: {nome}")
 
 
 NOMES_TRACO_RARO = ["reta_traco_raro", "curva_dir_traco_raro", "curva_esq_traco_raro"]
+NOMES_PISTA = ["reta", "reta_desalinhado", "curva_dir", "curva_esq", "curva_fechada_dir", "curva_fechada_esq",
+               "curva_s", "volta_oval", "largada_torta"] + NOMES_TRACO_RARO + ["curva_fechada_traco_raro"]
 NOMES = ["reta", "reta_desalinhado", "cone_centro", "cone_direita", "cone_esquerda",
          "cone_outra_faixa", "dois_cones", "curva_dir", "curva_esq", "curva_cone"]
 

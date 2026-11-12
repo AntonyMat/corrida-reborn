@@ -201,7 +201,11 @@ def main():
         print(f"Aprendido antes (dados/auto.json): volante {'INVERTIDO' if piloto.direcao.inverter else 'normal'}"
               f"{' (confirmado)' if piloto.adapt.confirmada else ' (a confirmar)'}, compensacao "
               f"{piloto.direcao.trim:+.2f}, faixa {piloto.faixas.W:.1f} cm")
-    print("LARGA NA HORA: o carro se calibra enquanto anda (devagar ate confirmar o sentido do volante).")
+    if getattr(config, "MODO_PILOTO", "completo") == "simples":
+        print(f"MODO SIMPLES: fica entre a pontilhada e a continua, mira {config.SEG_OLHAR_CM:.0f} cm a frente, "
+              f"velocidade {config.VELOCIDADE_BASE:.2f}. (MODO_PILOTO no config.py)")
+    else:
+        print("LARGA NA HORA: o carro se calibra enquanto anda (devagar ate confirmar o sentido do volante).")
 
     registro = None if a.sem_log else Registro()
     if registro:

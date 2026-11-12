@@ -25,6 +25,7 @@ from cones import DetectorCones, RastreadorCones
 from planejador import Planejador
 from controle import Direcao, velocidade
 from estabilidade import MedidaEstavel
+from seguidor import SeguidorFaixa
 from motor_auto import GovernadorMotor, pequeno_cinza
 from adaptacao import Adaptacao
 
@@ -65,6 +66,7 @@ class Piloto:
                                     limite=config.PROA_MAX_GRAUS)
         self._t_ok0 = None         # instante da primeira leitura boa da faixa
         self._n_ok = 0             # quadros com faixa lida desde a largada (olha antes de manobrar)
+        self.seg = SeguidorFaixa(self.cam)   # MODO SIMPLES: sempre entre a pontilhada e a continua
         self.adapt = Adaptacao(self)   # calibracao ANDANDO: sentido do volante, puxao, ganho, lado da continua
 
     def _alternar_espelho(self):
@@ -88,6 +90,9 @@ class Piloto:
 
         res = self.faixas.processar(frame, debug=debug)
         self.res = res
+        if getattr(config, "MODO_PILOTO", "completo") == "simples":
+            self.cones = []
+            return self._step_simples(t, dt, frame, fps, res)
         if config.CONES_ATIVOS:
             self.cones = self.rastreador.atualizar(self.detector.detectar(frame, debug=debug))
         else:
@@ -215,5 +220,48 @@ class Piloto:
         if limitada and speed > 0.05:
             speed = min(speed, max(config.LARGADA_VEL_MAX, self.gov.piso))
 
+        self.turn, self.speed = turn, speed
+        return turn, speed
+
+    # ------------------------------------------------------------------
+    def _step_simples(self, t, dt, frame, fps, res):
+        """Fica entre a pontilhada e a continua (seguidor.py). Sem aprendizado, sem governador."""
+        d = self.direcao
+        r = self.seg.passo(res.linhas or [], dt)
+        if r is not None:
+            alvo, erro, proa = r
+            if self.perdidos >= config.PERDIDO_QUADROS_DEVAGAR:
+                self.eventos.append("[pista] faixa reencontrada")
+            self.perdidos = 0
+            self.t_perdido = 0.0
+            self._perdido_avisado = False
+            self.motivo = "ok"
+            self.erro_cm, self.proa_graus = erro, proa
+            a = 1.0 - math.exp(-max(dt, 1e-3) / max(config.ESTERCO_TAU_S, 1e-3))
+            novo = d.turn + a * (alvo - d.turn)
+            passo = config.SEG_SLEW * dt
+            d.turn = max(-1.0, min(1.0, max(d.turn - passo, min(d.turn + passo, novo))))
+            turn = d.saida()
+            speed = config.VELOCIDADE_BASE * (1.0 - config.SEG_FREIO_CURVA * abs(d.turn))
+            if fps < config.FPS_MINIMO:
+                speed *= max(0.5, fps / config.FPS_MINIMO)
+            speed = max(config.PISO_MOTOR_MIN, speed)
+        else:
+            self.perdidos += 1
+            self.t_perdido += dt
+            self.motivo = res.motivo if res.motivo != "ok" else "sem as duas linhas da faixa"
+            if self.perdidos == 1:
+                self.eventos.append(f"[pista] perdi a faixa ({self.motivo})")
+            if self.t_perdido >= config.PERDIDO_PARAR_S:
+                if not self._perdido_avisado:
+                    self.eventos.append("[pista] sem faixa ha muito tempo -> PAROU")
+                    self._perdido_avisado = True
+                    self.seg.reset()           # ao voltar, procura a faixa a partir do centro do carro
+                turn = d.decair_tempo(dt, config.PARADO_TAU_S)
+                speed = 0.0
+            else:
+                turn = d.decair_tempo(dt, config.PERDIDO_TAU_S)
+                speed = config.VELOCIDADE_PERDIDO
+        self.deslocamento_cm = config.SEG_DESLOCAMENTO_CM
         self.turn, self.speed = turn, speed
         return turn, speed

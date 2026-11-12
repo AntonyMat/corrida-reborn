@@ -199,6 +199,25 @@ desfoque e reflexo (39 corridas simuladas). A largura da pista é aprendida anda
 - `python3 principal.py --maximo`: 100% o tempo todo, sem nenhuma freada (só nessa corrida).
 - `python3 principal.py --vel 0.6`: velocidade base mais baixa só nessa corrida.
 
+## Modo simples (padrão): sempre entre a pontilhada e a contínua
+
+`MODO_PILOTO = "simples"` no `config.py` (arquivo `seguidor.py`). A cada quadro:
+
+1. Cada linha detectada vai para o lado cuja posição esperada (centro do quadro anterior ± meia faixa) está mais
+   perto: **esquerda = pontilhada, direita = contínua**. Continuidade, e a classe só desempata (numa curva fechada a
+   contínua sai em parte da vista e parece pontilhada).
+2. Centro da faixa = meio das duas. Com uma só, ela ± meia faixa.
+3. Ponto-alvo no centro, `SEG_OLHAR_CM` à frente, filtrado (mediana + portão de pulo).
+4. Volante por **pure pursuit**: aponta as rodas para passar pelo ponto-alvo. Uma medida só, nada brigando.
+
+Sem aprendizado andando e sem governador de motor. Ajustes: `SEG_OLHAR_CM` (maior = mais suave, menos reativo),
+`SEG_GANHO`, `VELOCIDADE_BASE`, `SEG_DESLOCAMENTO_CM` (0 = exatamente no meio). O detector aceita linhas até ~65°
+(`LINHA_INCLIN_MAX`), o que pega curvas de raio ~80 cm. Na tela (`--ver`/`--web`): pontilhada em azul, contínua em
+laranja, centro em amarelo e o ponto-alvo vermelho. `MODO_PILOTO = "completo"` volta ao pipeline antigo.
+
+Simulador (`sim.NOMES_PISTA`, 13 cenários sem cone: retas, curvas de raio 130 e 80 cm, S, oval, largada torta,
+pontilhada rara) — validado em 8/12/20 FPS, velocidade 1,0× e 1,4×, câmera certa e descalibrada.
+
 ## Ver o que o carro lê, ao vivo (`--web`)
 
 ```bash
