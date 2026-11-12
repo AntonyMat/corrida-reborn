@@ -256,7 +256,7 @@ def main():
             if time.monotonic() - t_fps >= 2.0:
                 fps_medido = frames / (time.monotonic() - t_fps)
                 frames, t_fps = 0, time.monotonic()
-                _resumo(piloto, fps_medido)
+                _resumo(piloto, fps_medido, servo)
 
             if mostrar:
                 cv2.imshow("reborn-autonomos", visual.compor(piloto, frame))
@@ -294,7 +294,7 @@ def main():
         print("Desligado com seguranca.")
 
 
-def _resumo(p, fps):
+def _resumo(p, fps, servo=None):
     r = p.res
     linhas = ""
     if r is not None and r.linhas:
@@ -302,8 +302,16 @@ def _resumo(p, fps):
     d = p.direcao
     auto = (f"volante {'INV' if d.inverter != d.espelho else 'normal'}{'+' if p.adapt.confirmada else '?'} "
             f"trim {d.trim:+.2f} W {p.faixas.W:.0f}cm{' ESPELHADO' if p.espelhar else ''}")
+    # angulo FISICO do servo (graus), medido a partir da saida logica + calibracao
+    srv = ""
+    if servo is not None:
+        c = servo.cal["centro"]
+        alvo = servo.cal["esquerda"] if d.saida() < 0 else servo.cal["direita"]
+        curso = max(-config.SERVO_CURSO_USO_MAX, min(config.SERVO_CURSO_USO_MAX, alvo - c))
+        ang = c + abs(d.saida()) * curso
+        srv = f" | servo {ang:5.1f}deg (saida {d.saida():+.2f})"
     print(f"FPS {fps:4.1f} | {'OK' if p.motivo == 'ok' else 'PERDIDO: ' + p.motivo:<24s} | "
-          f"erro {p.erro_cm:+6.1f}cm proa {p.proa_graus:+5.1f} | turn {p.turn:+.2f} vel {p.speed:.2f} "
+          f"erro {p.erro_cm:+6.1f}cm proa {p.proa_graus:+5.1f} | turn {p.turn:+.2f} vel {p.speed:.2f}{srv} "
           f"| auto: {auto} | linhas {linhas or '-'}")
 
 
