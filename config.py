@@ -173,7 +173,7 @@ PROA_PESO           = 1.0     # peso do termo de proa
 ERRO_ZONA_MORTA_CM  = 0.6
 ESTERCO_SUAVIZACAO  = 0.70    # era 0.55: responde mais rapido ao erro    # EMA do comando de volante (1 = sem filtro)
 ESTERCO_SLEW        = 6.0     # maximo de variacao do turn (-1..1) por segundo
-ESTERCO_INVERTER    = False    # o volante deste carro esterca pro lado oposto ao esperado (visto no teste)
+ESTERCO_INVERTER    = True     # volante deste carro vira pro lado oposto (visto na corrida)
 
 # =====================================================================
 # 8. VELOCIDADE (0..1)
