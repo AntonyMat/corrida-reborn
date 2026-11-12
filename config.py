@@ -163,13 +163,13 @@ PORTA_ABRE_CM           = 8.0     # a cada quadro sem faixa, a tolerancia ao ult
 RELIGAR_SEM_CENTRO_QUADROS = 30   # tantos quadros sem faixa = esquece o historico
 
 # onde olhar adiante pra decidir a direcao (distancia a frente do eixo, cm)
-OLHAR_ADIANTE_CM    = 50.0    # olha mais longe para ver curva antes (era 38 cm)
+OLHAR_ADIANTE_CM    = 70.0    # era 50 cm: olha mais longe pra ver curva cedo
 
 # =====================================================================
 # 7. CONTROLE (Stanley)
 #   volante = erro_de_proa + atan(K * erro_lateral / (V0 + v))
 # =====================================================================
-STANLEY_K           = 6.0     # era 4.0: ganho lateral mais forte, o volante vai mais fundo
+STANLEY_K           = 2.5     # era 6.0: saturava o volante com erro pequeno (volante grudado num lado)
 STANLEY_V0_CMS      = 12.0    # evita divisao por ~0 em baixa velocidade
 V_CMS_NA_VEL_1      = 80.0    # velocidade estimada (cm/s) com speed=1.0 (so p/ o controle)
 ESTERCO_MAX_GRAUS   = 20.0    # esterco REAL maximo da roda deste carro (vira menos que 28 graus)    # esterco REAL maximo da roda (mede no carro)
@@ -209,7 +209,7 @@ VEL_REDUCAO_CURVA   = 0.25     # freia mais com volante virado (era 0.12)
 VEL_REDUCAO_INCERTO = 0.15    # tira ate isso quando a proa/erro estao grandes (carro torto na pista)
 INCERTO_PROA_GRAUS  = 25.0    # proa que conta como 'torto' total
 INCERTO_ERRO_CM     = 18.0    # erro lateral que conta como 'longe' total
-VEL_REDUCAO_CURVATURA = 0.35   # freia antes da curva (era 0.20)
+VEL_REDUCAO_CURVATURA = 0.50  # era 0.35: freia mais antes da curva
 CURVATURA_CHEIA     = 0.010   # curvatura (1/cm) que conta como 'curva fechada' total (raio 100 cm)
 VEL_REDUCAO_CONE    = 0.25    # tira ate isso com cone bem perto
 FPS_MINIMO          = 12.0    # abaixo disso o carro reduz a velocidade (freio automatico por FPS baixo)
