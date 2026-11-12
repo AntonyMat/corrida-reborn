@@ -59,6 +59,8 @@ def main():
                     help="faz a autocalibracao da escala ANTES de largar (padrao: larga na hora)")
     ap.add_argument("--esquecer", action="store_true",
                     help="ignora o que foi aprendido antes (dados/auto.json) e aprende do zero")
+    ap.add_argument("--status-cada", type=float, default=2.0,
+                    help="segundos entre as linhas de status (use 0.3 pra ver a proa/erro em detalhe)")
     ap.add_argument("--vel", type=float, default=None,
                     help="velocidade base desta corrida (0..1), sem mexer no config.py")
     a = ap.parse_args()
@@ -253,7 +255,7 @@ def main():
                 registro.telemetria(piloto, fps_medido)
 
             frames += 1
-            if time.monotonic() - t_fps >= 2.0:
+            if time.monotonic() - t_fps >= max(0.1, a.status_cada):
                 fps_medido = frames / (time.monotonic() - t_fps)
                 frames, t_fps = 0, time.monotonic()
                 _resumo(piloto, fps_medido, servo)

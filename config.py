@@ -66,6 +66,8 @@ CAMERA_CAPTURA_RES = (640, 360) # o que a camera ENTREGA (a sua mostrou 640x360 
 CAMERA_RES  = (320, 180)        # o que o piloto PROCESSA (mesma proporcao da captura!)
                                 # Proporcao diferente achata a imagem e erra toda a geometria.
 CAMERA_FPS  = 30
+CAMERA_EXPOSICAO = None          # None = automatica (padrao). Numero = exposicao MANUAL (unidade V4L2: 100 us).
+                                # Exposicao longa borra a imagem com o carro andando; teste 60..150.
 CAMERA_ESPELHAR = False         # True se a imagem sair de cabeca pra baixo/espelhada
 CAMERA_GIRAR_180 = False
 

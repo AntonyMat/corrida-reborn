@@ -47,6 +47,10 @@ def _abrir_indice(indice, res, fps):
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, res[1])
     cap.set(cv2.CAP_PROP_FPS, fps)
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    expo = getattr(config, "CAMERA_EXPOSICAO", None)
+    if expo is not None:                    # exposicao manual: menos borrao com o carro andando
+        cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)      # 1 = manual no V4L2
+        cap.set(cv2.CAP_PROP_EXPOSURE, float(expo))
     return cap
 
 
