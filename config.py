@@ -118,7 +118,7 @@ CONE_LARGURA_CM   = 18.0    # largura da BASE do cone
 # De que lado fica a faixa CONTINUA na sua faixa: "direita", "esquerda" ou "auto".
 # "auto": ao ligar, o carro mede qual das duas linhas ao lado dele e continua (a pontilhada tem
 # buracos) e, se for a da esquerda, ESPELHA a imagem: o resto do codigo nao muda.
-LADO_CONTINUO = "auto"
+LADO_CONTINUO = "direita"    # TRAVADO: sua pista tem continua a direita; nao deixa o detector espelhar
 
 # Linha de corrida: anda mais perto da PONTILHADA que do centro da faixa (ela pode ser
 # cruzada; a continua nao). 0 = centro; 1 = meia faixa pro lado da pontilhada.
