@@ -199,6 +199,24 @@ desfoque e reflexo (39 corridas simuladas). A largura da pista é aprendida anda
 - `python3 principal.py --maximo`: 100% o tempo todo, sem nenhuma freada (só nessa corrida).
 - `python3 principal.py --vel 0.6`: velocidade base mais baixa só nessa corrida.
 
+## Calibrar a câmera sem tela (`calibrar_geometria.py`)
+
+A geometria da câmera (altura, inclinação, campo de visão) vem do `config.py` e, se nunca foi calibrada, as linhas
+saem inclinadas e o controle recebe uma proa falsa. Com o carro **parado e alinhado** na faixa (a distância do lado do
+carro até a linha tem que ser igual na frente e atrás), e duas medidas com régua:
+
+```bash
+python3 calibrar_geometria.py --altura 31.5 --largura 28.5            # mostra antes/depois, não grava
+python3 calibrar_geometria.py --altura 31.5 --largura 28.5 --salvar   # grava dados/camera.json
+```
+
+* `--altura`: da lente ao chão (cm). Não é ajustada: fixa a escala.
+* `--largura`: entre duas linhas vizinhas, de **centro a centro** da tinta (cm).
+* Ajusta **inclinação** e **guinada** até as linhas ficarem paralelas e na largura certa. O campo de visão fica o do
+  `config.py`: numa pista reta ele é ambíguo com a inclinação (`--ajustar-fov` existe, mas não é recomendado).
+* Só grava se o ajuste ficar bom (custo ≤ 0,05). `python3 teste_calibracao.py` valida o método contra câmeras simuladas
+  com erro conhecido.
+
 ## Mudanças neste fork
 
 * **Fiação**: pinos do L298N e do servo conforme o carro (tabela acima).
