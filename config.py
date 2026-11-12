@@ -51,7 +51,7 @@ SERVO_ESQ_PADRAO      = 0.0
 SERVO_CENTRO_PADRAO   = 35.0
 SERVO_DIR_PADRAO      = 65.0
 SERVO_USAR_ARQUIVO    = False           # True = usa dados/servo.json (teste_servo.py --ajustar) em vez dos angulos acima
-SERVO_LIMITE_ABS      = (0.0, 180.0)    # NUNCA manda angulo fora disso
+SERVO_LIMITE_ABS      = (0.0, 65.0)     # bate com SERVO_ESQ_PADRAO/SERVO_DIR_PADRAO; nunca forca alem
 SERVO_PULSO_US        = (500, 2500)     # largura de pulso em 0 e 180 graus (0.0005 e 0.0025 s)
 SERVO_CURSO_USO_MAX   = 45.0            # em operacao o volante NUNCA passa disso (graus de servo) pra cada lado do
                                         # centro, mesmo que a calibracao marque mais: evita forcar o batente
