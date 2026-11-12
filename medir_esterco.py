@@ -44,7 +44,7 @@ def volta(servo, motores, turn, vel, tempo):
         time.sleep(1.0)
     servo.virar(turn)
     time.sleep(0.4)                       # servo chega na posicao antes de andar
-    motores.andar_por(vel, tempo)
+    motores.andar_por(vel, tempo, turn)      # com o diferencial: mede a curva REAL do carro como ele corre
     motores.parar()
     servo.virar(0.0)
 

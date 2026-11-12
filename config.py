@@ -36,6 +36,10 @@ MOTOR_B_INVERTIDO = False   # (em vez de trocar fios)
 # baixe o FATOR do motor mais FORTE (ex: 0.90). NAO suba acima de 1.0 - nao da pra pedir mais que 100%.
 MOTOR_A_FATOR = 1.0         # multiplica a potencia do ESQUERDO (canal A); 0.0..1.0
 MOTOR_B_FATOR = 1.0         # multiplica a potencia do DIREITO  (canal B); 0.0..1.0
+# DIFERENCIAL: na curva, motor de FORA mais forte e o de DENTRO mais fraco (ajuda a direcao fraca a virar).
+# Com o volante todo virado: fora = potencia x (1 + DIF_GANHO), dentro = potencia x (1 - DIF_GANHO). 0 = desliga.
+DIF_GANHO = 0.5
+DIF_INTERNO_MIN = 0.0        # a roda de dentro nunca recebe menos que isso x a potencia (0 = pode ate parar)
 
 # =====================================================================
 # 2. SERVO (graus) - valores de PARTIDA. Os valores reais saem do

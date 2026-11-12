@@ -299,17 +299,40 @@ class Motores:
         G.output(in2, G.LOW if frente else G.HIGH)
         pwm.ChangeDutyCycle(abs(speed) * 100.0 * fator)
 
-    def andar(self, speed):
+    @staticmethod
+    def dividir(speed, turn=0.0):
+        """(esquerdo, direito) pra uma potencia e um volante (-1 esquerda .. +1 direita).
+        DIFERENCIAL: na curva a roda de FORA recebe mais forca e a de DENTRO menos, ajudando a direcao a virar
+        o carro. Curva pra direita (turn > 0): esquerdo mais forte. A razao entre as duas e mantida se
+        alguma passar de 100%."""
+        k = max(0.0, float(config.DIF_GANHO))
+        t = max(-1.0, min(1.0, float(turn)))
+        if speed <= 0.0 or k == 0.0:
+            return speed, speed
+        esq = speed * (1.0 + k * t)
+        dire = speed * (1.0 - k * t)
+        m = max(esq, dire)
+        if m > 1.0:
+            esq, dire = esq / m, dire / m
+        piso = max(0.0, float(config.DIF_INTERNO_MIN)) * speed
+        return max(piso, esq), max(piso, dire)
+
+    def andar(self, speed, turn=0.0):
+        """speed 0..1 (negativo = re); turn = o MESMO comando mandado ao servo (pro diferencial)."""
         self._t_cmd = time.monotonic()
-        self.motor("A", speed)
-        self.motor("B", speed)
+        if speed > 0.0:
+            esq, dire = self.dividir(speed, turn)
+        else:
+            esq = dire = speed
+        self.motor("A", esq)       # A = esquerdo
+        self.motor("B", dire)      # B = direito
         self.ultimo = speed
 
-    def andar_por(self, speed, segundos):
+    def andar_por(self, speed, segundos, turn=0.0):
         """Anda por `segundos` renovando o comando (o watchdog para o motor se ele ficar mudo)."""
         fim = time.monotonic() + segundos
         while time.monotonic() < fim:
-            self.andar(speed)
+            self.andar(speed, turn)
             time.sleep(0.05)
 
     def parar(self):

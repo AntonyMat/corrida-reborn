@@ -156,7 +156,7 @@ def main():
 
         def passo(turn_raw, speed):
             servo.virar(turn_raw)
-            motores.andar(speed)
+            motores.andar(speed, turn_raw)
             while True:
                 f, idx, idade = thread.read()
                 if f is not None and idx != ultimo["idx"] and idade < 0.3:
@@ -261,7 +261,7 @@ def main():
                 piloto.turn, piloto.speed = turn, speed
             if servo:
                 servo.virar(turn)
-                motores.andar(speed)
+                motores.andar(speed, turn)
 
             if web_vez and piloto.res is not None and piloto.res.bev is not None:
                 tx.publicar(visual.compor(piloto, frame))
