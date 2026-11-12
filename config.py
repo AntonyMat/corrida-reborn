@@ -352,7 +352,8 @@ MODO_PILOTO          = "simples"
 LINHA_INCLIN_MAX     = 2.2    # inclinacao maxima de linha aceita (dX/dY). 2.2 = ~65 graus: pega curva fechada.
                               # Era 1.2 (~50 graus): em curva de raio ~80 cm a linha sumia. Linha atravessada (90) segue rejeitada
 SEG_OLHAR_CM         = 45.0   # ponto-alvo no centro da faixa, tantos cm a frente. Maior = mais suave, menos reativo
-SEG_GANHO            = 1.0    # multiplica o angulo do pure pursuit (1.0 = geometria pura)
+SEG_GANHO = 2.0    # o carro mediu ~31 graus/s por unidade contra ~70 esperados: a roda vira ~0.45x o suposto.
+                   # Estimativa. Rode medir_esterco.py pra medir de verdade (ele grava o valor certo e volta pra 1.0)
 SEG_ALVO_TAU_S       = 0.10   # filtro do ponto-alvo (s)
 SEG_PULO_CM          = 12.0   # ponto-alvo que pula mais que isso entre quadros = suspeito (segura ate confirmar)
 SEG_SLEW             = 4.0    # volante: variacao maxima por segundo
