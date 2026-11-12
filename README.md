@@ -199,6 +199,17 @@ desfoque e reflexo (39 corridas simuladas). A largura da pista é aprendida anda
 - `python3 principal.py --maximo`: 100% o tempo todo, sem nenhuma freada (só nessa corrida).
 - `python3 principal.py --vel 0.6`: velocidade base mais baixa só nessa corrida.
 
+## Ver o que o carro lê, ao vivo (`--web`)
+
+```bash
+python3 principal.py --web            # abre um servidor na porta 8080
+```
+
+Abra `http://<ip-do-pi>:8080` no PC ou no celular (mesma rede do Pi): câmera com a linha-alvo | vista de cima com as
+linhas achadas (A/D/B) e o centro da faixa, mais erro, proa, volante e velocidade. Só gasta CPU com o navegador aberto.
+O endereço é impresso ao iniciar. Qualquer pessoa na rede local pode ver o vídeo (somente leitura). Com tela no próprio
+Pi, `--ver` abre uma janela. Funciona junto com `--seco`.
+
 ## Calibrar a câmera sem tela (`calibrar_geometria.py`)
 
 A geometria da câmera (altura, inclinação, campo de visão) vem do `config.py` e, se nunca foi calibrada, as linhas

@@ -39,6 +39,7 @@ from geometria import carregar_parametros
 from piloto import Piloto
 from registro import Registro
 import visual
+import web_ver
 
 
 def main():
@@ -59,6 +60,8 @@ def main():
                     help="faz a autocalibracao da escala ANTES de largar (padrao: larga na hora)")
     ap.add_argument("--esquecer", action="store_true",
                     help="ignora o que foi aprendido antes (dados/auto.json) e aprende do zero")
+    ap.add_argument("--web", type=int, nargs="?", const=8080, default=0, metavar="PORTA",
+                    help="mostra a camera e o que o carro le no NAVEGADOR (http://ip-do-pi:PORTA, padrao 8080)")
     ap.add_argument("--status-cada", type=float, default=2.0,
                     help="segundos entre as linhas de status (use 0.3 pra ver a proa/erro em detalhe)")
     ap.add_argument("--vel", type=float, default=None,
@@ -202,6 +205,13 @@ def main():
     if registro:
         print(f"Log em {registro.pasta}")
 
+    tx = None
+    if a.web:
+        try:
+            tx = web_ver.Transmissor(a.web)
+            print(f"VISAO NO NAVEGADOR: http://{web_ver.ip_local()}:{tx.porta}   (PC/celular na mesma rede do Pi)")
+        except OSError as e:
+            print(f"(nao consegui abrir a porta {a.web} pro navegador: {e}; sigo sem a transmissao)")
     ultimo_idx = -1
     avisou_velho = False
     t_ini = time.monotonic()
@@ -231,7 +241,8 @@ def main():
             n += 1
             mostrar = ver and (n % config.DEBUG_CADA == 0)
             # BEV/mascara de debug custam copias: so quando ha janela ou no log, a cada N quadros
-            debug = mostrar or (registro is not None and n % config.DEBUG_LOG_CADA == 0)
+            web_vez = tx is not None and tx.clientes > 0 and n % config.WEB_CADA == 0     # so desenha com alguem vendo
+            debug = mostrar or web_vez or (registro is not None and n % config.DEBUG_LOG_CADA == 0)
             try:
                 turn, speed = piloto.step(agora, frame, fps=fps_medido, debug=debug)
             except Exception as e:      # um quadro ruim nao derruba a corrida: trata como faixa perdida
@@ -244,6 +255,9 @@ def main():
             if servo:
                 servo.virar(turn)
                 motores.andar(speed)
+
+            if web_vez and piloto.res is not None and piloto.res.bev is not None:
+                tx.publicar(visual.compor(piloto, frame))
 
             for linha in piloto.eventos:
                 print("  " + linha)
@@ -290,6 +304,8 @@ def main():
             except Exception as e:
                 print(f"(nao consegui salvar o aprendizado: {e})")
         thread.release()
+        if tx is not None:
+            tx.parar()
         if registro:
             registro.fechar()
         try:
