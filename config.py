@@ -146,7 +146,7 @@ JANELA_MIN_PX       = 14
 LINHA_MIN_PTS       = 45      # pixels minimos pra aceitar uma linha
 LINHA_MIN_EXTENSAO_CM = 6.0   # comprimento minimo (cm) de tinta alinhada (um tracejado)
 LINHA_RESIDUO_MAX_CM = 3.0    # erro medio do ajuste acima disso = rejeita
-CURVA_GRAU2_EXTENSAO = 0.6    # so ajusta parabola se a linha cobrir isso da BEV
+CURVA_GRAU2_EXTENSAO = 0.75   # era 0.6: so vira curva (parabola) com mais linha visivel, menos falso positivo
 
 LINHA_CURTA_FRAC     = 0.40   # linha com menos que isso da faixa visivel = 'curta' (so posicao, herda inclinacao)
 
@@ -163,7 +163,7 @@ PORTA_ABRE_CM           = 8.0     # a cada quadro sem faixa, a tolerancia ao ult
 RELIGAR_SEM_CENTRO_QUADROS = 30   # tantos quadros sem faixa = esquece o historico
 
 # onde olhar adiante pra decidir a direcao (distancia a frente do eixo, cm)
-OLHAR_ADIANTE_CM    = 70.0    # era 50 cm: olha mais longe pra ver curva cedo
+OLHAR_ADIANTE_CM    = 55.0    # era 70: a 70 cm a BEV dava curva falsa; 55 e meio-termo
 
 # =====================================================================
 # 7. CONTROLE (Stanley)
@@ -209,7 +209,7 @@ VEL_REDUCAO_CURVA   = 0.25     # freia mais com volante virado (era 0.12)
 VEL_REDUCAO_INCERTO = 0.15    # tira ate isso quando a proa/erro estao grandes (carro torto na pista)
 INCERTO_PROA_GRAUS  = 25.0    # proa que conta como 'torto' total
 INCERTO_ERRO_CM     = 18.0    # erro lateral que conta como 'longe' total
-VEL_REDUCAO_CURVATURA = 0.50  # era 0.35: freia mais antes da curva
+VEL_REDUCAO_CURVATURA = 0.35  # era 0.50: menos freada falsa em reta onde o detector 've' curva ruidosa
 CURVATURA_CHEIA     = 0.010   # curvatura (1/cm) que conta como 'curva fechada' total (raio 100 cm)
 VEL_REDUCAO_CONE    = 0.25    # tira ate isso com cone bem perto
 FPS_MINIMO          = 12.0    # abaixo disso o carro reduz a velocidade (freio automatico por FPS baixo)
