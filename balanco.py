@@ -88,9 +88,7 @@ def main():
             motores.andar_por(vel, a.tempo)
             motores.parar()
             r = input("Pra onde foi? (e=esquerda / d=direita / r=reto / q=sair) ").strip().lower()
-            if r == "q":
-                break
-            if r == "r":
+            if r in ("q", "r"):
                 salvar(fa, fb)
                 if aplicar_no_config(fa, fb):
                     print(f"Gravei A={fa:.3f}  B={fb:.3f} no config.py e em dados/balanco.json")
@@ -101,6 +99,8 @@ def main():
                 fb = max(0.3, fb - 0.05)   # desviou pra esquerda: direito mais forte, abaixa B
             elif r == "d":
                 fa = max(0.3, fa - 0.05)   # desviou pra direita: esquerdo mais forte, abaixa A
+            # salva a cada ajuste pra nao perder o progresso
+            salvar(fa, fb); aplicar_no_config(fa, fb)
     except KeyboardInterrupt:
         print("\nInterrompido.")
     finally:

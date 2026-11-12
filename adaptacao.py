@@ -61,6 +61,7 @@ class Adaptacao:
         self._pos_s = 0.0
         self._t_flip = -99.0
         self._t_ajuste = 0.0
+        self._t_desde_espelho = 1e9       # tempo desde o ultimo flip de espelho
         self._t_ini = None              # quando comecou a observar (janela do detector rapido)
 
     # ------------------------------------------------------------------
@@ -246,6 +247,7 @@ class Adaptacao:
     def lado(self, linhas, y_ref, dt=0.05):
         """Evidencia de qual lado e a CONTINUA. Tudo em TEMPO (igual em qualquer FPS).
         Devolve True se for pra ALTERNAR o espelho."""
+        self._t_desde_espelho += dt
         if self.lado_travado:
             return False
         esq = [l for l in linhas if l.cobertura is not None and -0.9 * self.p.faixas.W < float(l.x(y_ref)) < 0]
@@ -256,11 +258,16 @@ class Adaptacao:
         c_dir = min(dire, key=lambda l: float(l.x(y_ref))).cobertura       # a mais perto, a direita
         a = 1.0 - math.exp(-max(dt, 0.005) / config.LADO_TAU_S)
         self._lado_ema += a * ((c_dir - c_esq) - self._lado_ema)
+        # Cooldown: por ESPELHO_COOLDOWN_S depois de espelhar, pede evidencia FORTE
+        # (2x a margem normal) pra re-espelhar; isso impede oscilacao em curva/fora do centro.
+        margem = config.LADO_MARGEM
+        if self._t_desde_espelho < config.ESPELHO_COOLDOWN_S:
+            margem = 2.0 * config.LADO_MARGEM
         # no mundo em que o piloto enxerga a continua deve estar a DIREITA: evidencia > 0
-        if self._lado_ema < -config.LADO_MARGEM:
+        if self._lado_ema < -margem:
             self._lado_neg += dt
             self._lado_pos = 0.0
-        elif self._lado_ema > config.LADO_MARGEM:
+        elif self._lado_ema > margem:
             self._lado_pos += dt
             self._lado_neg = 0.0
         else:
@@ -273,6 +280,7 @@ class Adaptacao:
         if self._lado_neg >= config.LADO_TROCA_S:
             self._lado_neg = self._lado_pos = 0.0
             self._lado_ema = 0.0
+            self._t_desde_espelho = 0.0
             self.eventos.append("[auto] a faixa continua esta do OUTRO lado: espelhando a imagem")
             return True
         return False
