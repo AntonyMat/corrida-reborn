@@ -218,7 +218,8 @@ class Adaptacao:
             self.eventos.append(f"[auto] sentido do volante CONFIRMADO (ganho {self.K:+.0f} graus/s por unidade)")
 
         # ---- trim e ganho (devagar, so com o sentido confirmado)
-        if self.confirmada and t - self._t_ajuste >= config.ADAPT_AJUSTE_S:
+        if (self.confirmada and not getattr(config, "ADAPT_TRAVAR_TRIM_GANHO", False)
+                and t - self._t_ajuste >= config.ADAPT_AJUSTE_S):
             self._t_ajuste = t
             d = p.direcao
             if self._t_reta >= config.ADAPT_TRIM_MIN_RETA_S:
@@ -303,8 +304,9 @@ class Adaptacao:
         d = self.p.direcao
         if e.get("confirmada"):
             d.inverter = bool(e.get("inverter", d.inverter))
-            d.trim = float(e.get("trim", 0.0))
-            d.ganho = float(np.clip(e.get("ganho", 1.0), config.ADAPT_GANHO_MIN, config.ADAPT_GANHO_MAX))
+            if not getattr(config, "ADAPT_TRAVAR_TRIM_GANHO", False):
+                d.trim = float(e.get("trim", 0.0))
+                d.ganho = float(np.clip(e.get("ganho", 1.0), config.ADAPT_GANHO_MIN, config.ADAPT_GANHO_MAX))
             self.confirmada = True
         if e.get("W_amostras", 0) >= 30:
             f = self.p.faixas

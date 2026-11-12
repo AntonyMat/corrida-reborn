@@ -274,6 +274,11 @@ ADAPTACAO = True
 ADAPT_TRAVAR_INVERTER = True   # NAO permite que a adaptacao troque o sentido do volante
                                # (ESTERCO_INVERTER do config.py manda). Impede oscilacao
                                # quando o carro sai da pista e o detector se confunde.
+ADAPT_TRAVAR_TRIM_GANHO = True  # NAO aprende nem le do arquivo o trim (puxao) e o ganho do volante:
+                               # ficam em 0 e 1. O aprendizado andando encostava no limite (trim -0.35)
+                               # e desviava o volante em qualquer situacao.
+MOTOR_PISO_APRENDER = False    # NAO le nem grava dados/motor.json (piso 0.75 fazia o carro andar a 75-80%).
+                               # Se o carro nao andar em 55%, suba PISO_MOTOR_MIN aqui no config.
 CARRO_ENTREEIXOS_CM = 20.0    # distancia entre eixos (so da a escala do ganho nominal da direcao)
 ADAPT_TAU_S = 2.0             # memoria da regressao (esquecimento)
 ADAPT_JANELA_S = 0.35         # janela curta pra medir o giro (inclinacao da proa)

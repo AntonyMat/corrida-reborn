@@ -81,7 +81,7 @@ def main():
         ver = False
 
     params, origem = carregar_parametros()
-    piso_salvo = hardware.carregar_piso()
+    piso_salvo = hardware.carregar_piso() if config.MOTOR_PISO_APRENDER else None
     piloto = Piloto(params, config.CAMERA_RES, piso=piso_salvo)
     print(f"Potencia minima pra andar: {piloto.gov.piso:.2f} "
           f"({'aprendida em dados/motor.json' if piso_salvo is not None else 'padrao do config; o carro aprende sozinho'})")
@@ -275,17 +275,20 @@ def main():
         if servo:
             servo.fechar()
         hardware.limpar()
-        if piloto.gov.piso > piloto.gov.piso_inicial + 0.005:
+        if a.seco:
+            print("(modo seco: nao gravei nada em dados/ - o carro nao andou, entao nao ha o que aprender)")
+        elif config.MOTOR_PISO_APRENDER and piloto.gov.piso > piloto.gov.piso_inicial + 0.005:
             salvo = min(piloto.gov.piso, config.PISO_SALVAR_MAX)
             hardware.salvar_piso(salvo)
             print(f"Potencia minima aprendida: {piloto.gov.piso:.2f} (salva {salvo:.2f} em dados/motor.json)")
             if piloto.gov.piso > config.PISO_SALVAR_MAX:
                 print(f"  ATENCAO: o carro quis mais que {config.PISO_SALVAR_MAX:.2f} pra andar: confira a bateria "
                       f"dos motores, o jumper do ENA/ENB e a camera (imagem congelada engana o aprendizado).")
-        try:
-            adaptacao.salvar_auto(piloto.adapt.estado(), servo.cal if servo is not None else None)
-        except Exception as e:
-            print(f"(nao consegui salvar o aprendizado: {e})")
+        if not a.seco:
+            try:
+                adaptacao.salvar_auto(piloto.adapt.estado(), servo.cal if servo is not None else None)
+            except Exception as e:
+                print(f"(nao consegui salvar o aprendizado: {e})")
         thread.release()
         if registro:
             registro.fechar()
