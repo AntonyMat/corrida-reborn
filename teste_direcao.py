@@ -37,8 +37,8 @@ def aplicar_config(inverter: bool):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--vel", type=float, default=0.65)
-    ap.add_argument("--tempo", type=float, default=1.5)
+    ap.add_argument("--vel", type=float, default=0.80)
+    ap.add_argument("--tempo", type=float, default=3.0)
     ap.add_argument("--simulado", action="store_true")
     a = ap.parse_args()
     vel = max(0.4, min(1.0, a.vel))
